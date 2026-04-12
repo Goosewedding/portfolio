@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Icons — Style Guide</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+
+    /* ---- Icon grid ---- */
+
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-12);
+    }
+
+    .icon-card {
+      border: 1px solid var(--border-default);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Stage shows the icon on light and dark halves */
+    .icon-card__stage {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 120px;
+    }
+
+    .icon-card__half {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-card__half--light {
+      background: var(--color-white);
+      color: var(--color-black);
+    }
+
+    .icon-card__half--dark {
+      background: var(--color-black);
+      color: var(--color-white);
+    }
+
+    .icon-card__half img {
+      display: block;
+    }
+
+    /* currentColor trick: inline SVG inherits color from parent */
+    .icon-card__half svg {
+      display: block;
+    }
+
+    .icon-card__info {
+      padding: var(--space-4) var(--space-4) var(--space-4);
+      border-top: 1px solid var(--border-default);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .icon-card__name {
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-bold);
+      color: var(--text-primary);
+    }
+
+    .icon-card__meta {
+      font-family: 'Courier New', monospace;
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+    }
+
+    /* ---- Size scale demo ---- */
+
+    .size-row {
+      display: flex;
+      align-items: flex-end;
+      gap: var(--space-8);
+      padding: var(--space-6) 0;
+      border-bottom: 1px solid var(--border-default);
+    }
+
+    .size-row:last-child { border-bottom: none; }
+
+    .size-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .size-item__label {
+      font-family: 'Courier New', monospace;
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    /* ---- Code block ---- */
+
+    .code-block {
+      background-color: var(--color-gray-950);
+      color: var(--color-gray-300);
+      font-family: 'Courier New', monospace;
+      font-size: var(--text-xs);
+      line-height: 1.7;
+      padding: var(--space-6) var(--space-8);
+      overflow-x: auto;
+      white-space: pre;
+      margin-bottom: var(--space-3);
+    }
+
+    .token-comment  { color: var(--color-gray-600); }
+    .token-tag      { color: #a8c4e0; }
+    .token-attr     { color: #c9a9e0; }
+    .token-val      { color: #a8e0b4; }
+
+    /* ---- Spec table ---- */
+
+    .spec-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--border-default);
+      font-family: 'Courier New', monospace;
+      font-size: var(--text-xs);
+    }
+
+    .spec-row:last-child { border-bottom: none; }
+    .spec-key { color: var(--text-secondary); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+    .spec-val code { background: var(--color-gray-100); padding: 1px 5px; border-radius: 2px; }
+
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="site-nav__left">
+      <a href="index.html" class="btn--secondary">
+        <svg width="1em" height="1em" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+        </svg>
+      </a>
+      <a href="portfolio.html" class="btn--secondary">Portfolio</a>
+      <a href="#" class="btn--secondary">Blog</a>
+      <a href="#" class="btn--secondary">Contact</a>
+    </div>
+    <div class="site-nav__right">
+      <a href="login.html" class="btn--secondary" id="nav-admin-link">Admin Login</a>
+    </div>
+  </nav>
+
+  <div class="sg-layout">
+
+    <!-- ====================================================
+         SIDEBAR NAV
+         ==================================================== -->
+    <nav class="sg-nav">
+      <a class="sg-nav__logo" href="styleguide.html" style="text-decoration:none;">← Style Guide</a>
+
+      <div>
+        <p class="sg-nav__section-title">On this page</p>
+        <div class="sg-nav__links">
+          <a class="sg-nav__link active" href="#all-icons">All Icons</a>
+          <a class="sg-nav__link" href="#sizes">Sizes</a>
+          <a class="sg-nav__link" href="#usage">Usage</a>
+        </div>
+      </div>
+
+      <button class="sg-nav__logout" id="logoutBtn">Log out</button>
+    </nav>
+
+
+    <!-- ====================================================
+         MAIN CONTENT
+         ==================================================== -->
+    <main class="sg-main">
+
+      <div style="margin-bottom: var(--space-16);">
+        <p class="label" style="margin-bottom: var(--space-3);">Components</p>
+        <h1 class="display-lg" style="margin-bottom: var(--space-3);">Icons</h1>
+        <p class="body-lg" style="color: var(--text-secondary);">
+          All icons use <code style="font-size:var(--text-sm); background:var(--color-gray-100); padding:1px 6px; border-radius:2px;">currentColor</code> — set the CSS <code style="font-size:var(--text-sm); background:var(--color-gray-100); padding:1px 6px; border-radius:2px;">color</code> property on the parent to recolor.
+          Each icon is shown on a light and dark background.
+        </p>
+      </div>
+
+
+      <!-- ====================================================
+           ALL ICONS
+           ==================================================== -->
+      <section class="sg-section" id="all-icons">
+        <div class="sg-section__header">
+          <h2 class="sg-section__title">All Icons</h2>
+          <span class="sg-section__tag">3 icons</span>
+        </div>
+
+        <div class="icon-grid">
+
+          <!-- Folder -->
+          <div class="icon-card">
+            <div class="icon-card__stage">
+              <div class="icon-card__half icon-card__half--light">
+                <svg width="28" height="24" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 12H0V0H3.5814L4.55814 1H14V12Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="icon-card__half icon-card__half--dark">
+                <svg width="28" height="24" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 12H0V0H3.5814L4.55814 1H14V12Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+            <div class="icon-card__info">
+              <span class="icon-card__name">Folder</span>
+              <span class="icon-card__meta">folder.svg · 14 × 12px</span>
+            </div>
+          </div>
+
+          <!-- Folder Open -->
+          <div class="icon-card">
+            <div class="icon-card__stage">
+              <div class="icon-card__half icon-card__half--light">
+                <svg width="32" height="24" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14.0408 1V2.66667H1.95918L0 10.3333V2.66667V0H3.59184L4.57143 1H14.0408Z" fill="currentColor"/>
+                  <path d="M14.2041 12H0.489796L2.44898 3.5H16L14.2041 12Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="icon-card__half icon-card__half--dark">
+                <svg width="32" height="24" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14.0408 1V2.66667H1.95918L0 10.3333V2.66667V0H3.59184L4.57143 1H14.0408Z" fill="currentColor"/>
+                  <path d="M14.2041 12H0.489796L2.44898 3.5H16L14.2041 12Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+            <div class="icon-card__info">
+              <span class="icon-card__name">Folder Open</span>
+              <span class="icon-card__meta">folder-open.svg · 16 × 12px</span>
+            </div>
+          </div>
+
+          <!-- Computer -->
+          <div class="icon-card">
+            <div class="icon-card__stage">
+              <div class="icon-card__half icon-card__half--light">
+                <svg width="24" height="28" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="icon-card__half icon-card__half--dark">
+                <svg width="24" height="28" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+            <div class="icon-card__info">
+              <span class="icon-card__name">Computer</span>
+              <span class="icon-card__meta">computer.svg · 16 × 19px</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ====================================================
+           SIZES
+           ==================================================== -->
+      <section class="sg-section" id="sizes">
+        <div class="sg-section__header">
+          <h2 class="sg-section__title">Sizes</h2>
+          <span class="sg-section__tag">Scale with width/height</span>
+        </div>
+
+        <p class="caption" style="margin-bottom: var(--space-8);">
+          Icons are vector — scale freely by setting <code style="background:var(--color-gray-100); padding:1px 5px; border-radius:2px;">width</code> and <code style="background:var(--color-gray-100); padding:1px 5px; border-radius:2px;">height</code> on the <code style="background:var(--color-gray-100); padding:1px 5px; border-radius:2px;">&lt;svg&gt;</code> tag or via CSS. Keep aspect ratio locked.
+        </p>
+
+        <!-- Folder at scale -->
+        <h3 class="label" style="margin-bottom: var(--space-4);">Folder</h3>
+        <div class="size-row" style="margin-bottom: var(--space-10);">
+
+          <div class="size-item">
+            <svg width="12" height="10" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 12H0V0H3.5814L4.55814 1H14V12Z" fill="currentColor"/>
+            </svg>
+            <span class="size-item__label">12px</span>
+          </div>
+
+          <div class="size-item">
+            <svg width="16" height="14" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 12H0V0H3.5814L4.55814 1H14V12Z" fill="currentColor"/>
+            </svg>
+            <span class="size-item__label">16px</span>
+          </div>
+
+          <div class="size-item">
+            <svg width="24" height="21" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 12H0V0H3.5814L4.55814 1H14V12Z" fill="currentColor"/>
+            </svg>
+            <span class="size-item__label">24px</span>
+          </div>
+
+          <div class="size-item">
+            <svg width="32" height="27" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 12H0V0H3.5814L4.55814 1H14V12Z" fill="currentColor"/>
+            </svg>
+            <span class="size-item__label">32px</span>
+          </div>
+
+          <div class="size-item">
+            <svg width="48" height="41" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 12H0V0H3.5814L4.55814 1H14V12Z" fill="currentColor"/>
+            </svg>
+            <span class="size-item__label">48px</span>
+          </div>
+
+          <div class="size-item">
+            <svg width="64" height="55" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 12H0V0H3.5814L4.55814 1H14V12Z" fill="currentColor"/>
+            </svg>
+            <span class="size-item__label">64px</span>
+          </div>
+
+        </div>
+
+        <!-- Computer at scale -->
+        <h3 class="label" style="margin-bottom: var(--space-4);">Computer</h3>
+        <div class="size-row">
+
+          <div class="size-item">
+            <svg width="10" height="12" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+            </svg>
+            <span class="size-item__label">12px</span>
+          </div>
+
+          <div class="size-item">
+            <svg width="13" height="16" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+            </svg>
+            <span class="size-item__label">16px</span>
+          </div>
+
+          <div class="size-item">
+            <svg width="20" height="24" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+            </svg>
+            <span class="size-item__label">24px</span>
+          </div>
+
+          <div class="size-item">
+            <svg width="27" height="32" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+            </svg>
+            <span class="size-item__label">32px</span>
+          </div>
+
+          <div class="size-item">
+            <svg width="40" height="48" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+            </svg>
+            <span class="size-item__label">48px</span>
+          </div>
+
+          <div class="size-item">
+            <svg width="54" height="64" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+            </svg>
+            <span class="size-item__label">64px</span>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ====================================================
+           USAGE
+           ==================================================== -->
+      <section class="sg-section" id="usage">
+        <div class="sg-section__header">
+          <h2 class="sg-section__title">Usage</h2>
+          <span class="sg-section__tag">How to use icons in HTML</span>
+        </div>
+
+        <h3 class="label" style="margin-bottom: var(--space-4);">Inline SVG (recommended)</h3>
+        <p class="body-sm" style="color:var(--text-secondary); margin-bottom: var(--space-4);">
+          Paste the SVG code directly into your HTML. The icon inherits color from its parent element via <code style="background:var(--color-gray-100); padding:1px 4px; border-radius:2px;">currentColor</code>.
+        </p>
+        <div class="code-block"><span class="token-comment">&lt;!-- Icon inherits color from parent --&gt;</span>
+&lt;<span class="token-tag">span</span> <span class="token-attr">style</span>="<span class="token-val">color: white</span>"&gt;
+  &lt;<span class="token-tag">svg</span> <span class="token-attr">width</span>="<span class="token-val">16</span>" <span class="token-attr">height</span>="<span class="token-val">12</span>" <span class="token-attr">viewBox</span>="<span class="token-val">0 0 14 12</span>" <span class="token-attr">fill</span>="<span class="token-val">none</span>"&gt;
+    &lt;<span class="token-tag">path</span> <span class="token-attr">d</span>="<span class="token-val">M14 12H0V0H3.5814L4.55814 1H14V12Z</span>" <span class="token-attr">fill</span>="<span class="token-val">currentColor</span>"/&gt;
+  &lt;/<span class="token-tag">svg</span>&gt;
+&lt;/<span class="token-tag">span</span>&gt;</div>
+
+        <h3 class="label" style="margin-top: var(--space-8); margin-bottom: var(--space-4);">As an &lt;img&gt; tag</h3>
+        <p class="body-sm" style="color:var(--text-secondary); margin-bottom: var(--space-4);">
+          Simpler to write, but <strong>cannot be recolored</strong> via CSS — the icon will always render in its native color.
+        </p>
+        <div class="code-block">&lt;<span class="token-tag">img</span> <span class="token-attr">src</span>="<span class="token-val">icons/folder.svg</span>" <span class="token-attr">width</span>="<span class="token-val">24</span>" <span class="token-attr">alt</span>="<span class="token-val">Folder</span>"&gt;</div>
+
+        <h3 class="label" style="margin-top: var(--space-8); margin-bottom: var(--space-4);">Sizing in CSS</h3>
+        <div class="code-block"><span class="token-comment">/* Control size via CSS instead of HTML attributes */</span>
+.<span class="token-tag">icon</span> {
+  <span class="token-attr">width</span>: <span class="token-val">1em</span>;   <span class="token-comment">/* scales with font-size of parent */</span>
+  <span class="token-attr">height</span>: <span class="token-val">1em</span>;
+  <span class="token-attr">display</span>: <span class="token-val">inline-block</span>;
+  <span class="token-attr">vertical-align</span>: <span class="token-val">middle</span>;
+}</div>
+
+      </section>
+
+
+    </main>
+  </div>
+
+
+  <script src="js/auth.js"></script>
+  <script>
+    Auth.requireAuth();
+    document.getElementById('logoutBtn').addEventListener('click', () => Auth.logout());
+
+    // Highlight active nav link on scroll
+    const sections = document.querySelectorAll('.sg-section');
+    const navLinks = document.querySelectorAll('.sg-nav__link');
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(l => l.classList.remove('active'));
+          const active = document.querySelector(`.sg-nav__link[href="#${entry.target.id}"]`);
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+
+    sections.forEach(s => observer.observe(s));
+  </script>
+  <script src="js/nav.js"></script>
+
+</body>
+</html>

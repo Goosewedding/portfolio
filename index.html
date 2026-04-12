@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background-color: #000000;
+      background-image: url('images/background.gif');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      image-rendering: pixelated;
+      min-height: 100vh;
+      margin: 0;
+    }
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    html.first-launch body {
+      opacity: 0;
+      animation: fade-in 0.5s ease forwards;
+    }
+  </style>
+  <script>
+    if (!localStorage.getItem('startup_played')) {
+      document.documentElement.classList.add('first-launch');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Navigation — pulled from components/navigation.html -->
+  <nav class="site-nav">
+    <div class="site-nav__left">
+      <a href="index.html" class="btn--secondary">
+        <svg width="1em" height="1em" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+        </svg>
+      </a>
+      <a href="portfolio.html" class="btn--secondary">Portfolio</a>
+      <a href="#" class="btn--secondary">Blog</a>
+      <a href="#" class="btn--secondary">Contact</a>
+    </div>
+    <div class="site-nav__right">
+      <a href="login.html" class="btn--secondary" id="nav-admin-link">Admin Login</a>
+    </div>
+  </nav>
+
+  <!-- Banner -->
+  <div class="page-content" style="display:flex; justify-content:center; margin-top:64px;">
+    <img src="icons/NileKroner homepage banner.svg" alt="Nile Kroner" width="496" height="94" style="max-width:100%; height:auto; display:block;">
+  </div>
+
+  <!-- Card -->
+  <div class="page-content" style="display:flex; justify-content:center; margin-top:var(--space-6);">
+    <div style="width:496px; max-width:100%; background-color:#000000; border:1px solid #FFFFFF; overflow:hidden;">
+      <div style="background-color:#FFFFFF; height:28px; display:flex; align-items:center; padding:0 16px;">
+        <h2 class="heading-sm" style="color:#000000; font-size:16px;">Hello!</h2>
+      </div>
+      <div style="padding:16px;">
+        <p class="body-base" id="home-para" style="color:#FFFFFF;">
+          This website serves as my growing archive of projects and daydreams bigger than life itself. I've made a living as an artist and designer since 2020, but it has been my life since 1998. Below is a curated index of my professional work.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buttons card -->
+  <div class="page-content" style="display:flex; justify-content:center; margin-top:24px;">
+    <div style="width:496px; max-width:100%; background-color:#000000; border:1px solid #FFFFFF; overflow:hidden;">
+      <div style="padding:16px 16px 64px 16px;">
+      <div id="folder-list" style="display:flex; flex-direction:column; align-items:flex-start; gap:var(--space-2);"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <audio id="startup-sound" src="startup.m4a" preload="auto"></audio>
+  <audio id="folder-sound" src="folderopen.mp3" preload="auto"></audio>
+
+  <script src="js/published-data.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/folders.js"></script>
+  <script>
+    (function () {
+      if (localStorage.getItem('startup_played')) return;
+
+      const audio = document.getElementById('startup-sound');
+
+      function playStartup() {
+        audio.play().then(() => {
+          localStorage.setItem('startup_played', '1');
+        }).catch(() => {});
+        document.removeEventListener('click', playStartup);
+        document.removeEventListener('keydown', playStartup);
+      }
+
+      // Try autoplay immediately; if browser blocks it, wait for first interaction
+      audio.play().then(() => {
+        localStorage.setItem('startup_played', '1');
+      }).catch(() => {
+        document.addEventListener('click', playStartup);
+        document.addEventListener('keydown', playStartup);
+      });
+    })();
+
+    Folders.render(document.getElementById('folder-list'));
+
+    // Home paragraph — load saved content; make editable in admin mode
+    (function () {
+      const para = document.getElementById('home-para');
+      const PARA_KEY = 'home_para';
+      const isAdmin = sessionStorage.getItem('portfolio_auth') === 'true';
+
+      const saved = localStorage.getItem(PARA_KEY);
+      if (saved) para.innerHTML = saved;
+
+      if (!isAdmin) return;
+
+      para.contentEditable = 'true';
+      para.classList.add('cb-title--editable');
+
+      para.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); para.blur(); }
+      });
+
+      para.addEventListener('blur', () => {
+        const content = para.innerHTML.trim();
+        if (content) localStorage.setItem(PARA_KEY, content);
+      });
+    })();
+  </script>
+
+</body>
+</html>

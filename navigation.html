@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Navigation — Style Guide</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+
+    .spec-row {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--border-default);
+      font-family: 'Courier New', monospace;
+      font-size: var(--text-xs);
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-key { color: var(--text-secondary); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+    .spec-val code { background: var(--color-gray-100); padding: 1px 5px; border-radius: 2px; }
+
+    .code-block {
+      background-color: var(--color-gray-950);
+      color: var(--color-gray-300);
+      font-family: 'Courier New', monospace;
+      font-size: var(--text-xs);
+      line-height: 1.7;
+      padding: var(--space-6) var(--space-8);
+      overflow-x: auto;
+      white-space: pre;
+      margin-bottom: var(--space-3);
+    }
+    .token-comment  { color: var(--color-gray-600); }
+    .token-tag      { color: #a8c4e0; }
+    .token-attr     { color: #c9a9e0; }
+    .token-val      { color: #a8e0b4; }
+
+    /* Component preview wrapper */
+    .component-preview {
+      border: 1px solid var(--border-default);
+      margin-bottom: var(--space-3);
+      overflow: hidden;
+    }
+
+    .component-preview__label {
+      font-family: 'Courier New', monospace;
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-8);
+    }
+
+    /* Anatomy diagram */
+    .anatomy-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-10);
+    }
+
+    .anatomy-card {
+      border: 1px solid var(--border-default);
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .anatomy-card__num {
+      font-family: 'Courier New', monospace;
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+    }
+
+    .anatomy-card__label {
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-bold);
+    }
+
+    .anatomy-card__desc {
+      font-family: var(--font-body);
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+    }
+
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <div class="site-nav__left">
+      <a href="index.html" class="btn--secondary">
+        <svg width="1em" height="1em" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+        </svg>
+      </a>
+      <a href="portfolio.html" class="btn--secondary">Portfolio</a>
+      <a href="#" class="btn--secondary">Blog</a>
+      <a href="#" class="btn--secondary">Contact</a>
+    </div>
+    <div class="site-nav__right">
+      <a href="login.html" class="btn--secondary" id="nav-admin-link">Admin Login</a>
+    </div>
+  </nav>
+
+  <div class="sg-layout">
+
+    <!-- ====================================================
+         SIDEBAR NAV
+         ==================================================== -->
+    <nav class="sg-nav">
+      <a class="sg-nav__logo" href="styleguide.html" style="text-decoration:none;">← Style Guide</a>
+
+      <div>
+        <p class="sg-nav__section-title">On this page</p>
+        <div class="sg-nav__links">
+          <a class="sg-nav__link active" href="#component">Component</a>
+          <a class="sg-nav__link" href="#states">States</a>
+          <a class="sg-nav__link" href="#anatomy">Anatomy</a>
+          <a class="sg-nav__link" href="#specs">Specs</a>
+          <a class="sg-nav__link" href="#code">Code</a>
+        </div>
+      </div>
+
+      <button class="sg-nav__logout" id="logoutBtn">Log out</button>
+    </nav>
+
+
+    <!-- ====================================================
+         MAIN CONTENT
+         ==================================================== -->
+    <main class="sg-main">
+
+      <div style="margin-bottom: var(--space-16);">
+        <p class="label" style="margin-bottom: var(--space-3);">Components</p>
+        <h1 class="display-lg" style="margin-bottom: var(--space-3);">Navigation</h1>
+        <p class="body-lg" style="color: var(--text-secondary);">
+          Site-wide header. This is the source of truth — pull from here when building pages.
+        </p>
+      </div>
+
+
+      <!-- ====================================================
+           COMPONENT
+           ==================================================== -->
+      <section class="sg-section" id="component">
+        <div class="sg-section__header">
+          <h2 class="sg-section__title">Component</h2>
+          <span class="sg-section__tag">.site-nav</span>
+        </div>
+
+        <p class="component-preview__label">Default state — hover over links to see interaction</p>
+        <div class="component-preview">
+          <nav class="site-nav">
+            <div class="site-nav__left">
+              <a href="#" class="btn--secondary">
+                <svg width="1em" height="1em" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+                </svg>
+              </a>
+              <a href="portfolio.html" class="btn--secondary">Portfolio</a>
+              <a href="#" class="btn--secondary">Blog</a>
+              <a href="#" class="btn--secondary">Contact</a>
+            </div>
+            <div class="site-nav__right">
+              <a href="login.html" class="btn--secondary">Admin Login</a>
+            </div>
+          </nav>
+        </div>
+
+      </section>
+
+
+      <!-- ====================================================
+           STATES
+           ==================================================== -->
+      <section class="sg-section" id="states">
+        <div class="sg-section__header">
+          <h2 class="sg-section__title">States</h2>
+          <span class="sg-section__tag">Default · Hover</span>
+        </div>
+
+        <!-- Default -->
+        <p class="label" style="margin-bottom: var(--space-4);">Default</p>
+        <div class="component-preview" style="margin-bottom: var(--space-8);">
+          <nav class="site-nav">
+            <div class="site-nav__left">
+              <a href="#" class="btn--secondary">
+                <svg width="1em" height="1em" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+                </svg>
+              </a>
+              <a href="portfolio.html" class="btn--secondary">Portfolio</a>
+              <a href="#" class="btn--secondary">Blog</a>
+              <a href="#" class="btn--secondary">Contact</a>
+            </div>
+            <div class="site-nav__right">
+              <a href="login.html" class="btn--secondary">Admin Login</a>
+            </div>
+          </nav>
+        </div>
+        <p class="caption" style="margin-bottom: var(--space-10);">White background · black text · 6px black bottom border</p>
+
+        <!-- Hover (forced) -->
+        <p class="label" style="margin-bottom: var(--space-4);">Hover state (Portfolio active)</p>
+        <div class="component-preview" style="margin-bottom: var(--space-8);">
+          <nav class="site-nav">
+            <div class="site-nav__left">
+              <a href="#" class="btn--secondary">
+                <svg width="1em" height="1em" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" fill="currentColor"/>
+                </svg>
+              </a>
+              <a href="#" class="btn--secondary" style="background-color:#D5DEE9; color:#000000;">Portfolio</a>
+              <a href="#" class="btn--secondary">Blog</a>
+              <a href="#" class="btn--secondary">Contact</a>
+            </div>
+            <div class="site-nav__right">
+              <a href="login.html" class="btn--secondary">Admin Login</a>
+            </div>
+          </nav>
+        </div>
+        <p class="caption" style="margin-bottom: var(--space-10);">Hovered link: black fill · white text · 150ms ease transition</p>
+
+      </section>
+
+
+      <!-- ====================================================
+           ANATOMY
+           ==================================================== -->
+      <section class="sg-section" id="anatomy">
+        <div class="sg-section__header">
+          <h2 class="sg-section__title">Anatomy</h2>
+          <span class="sg-section__tag">4 elements</span>
+        </div>
+
+        <div class="anatomy-grid">
+
+          <div class="anatomy-card">
+            <span class="anatomy-card__num">01</span>
+            <span class="anatomy-card__label">Nav wrapper</span>
+            <span class="anatomy-card__desc"><code style="font-size:10px; background:var(--color-gray-100); padding:1px 4px;">.site-nav</code> — full-width flex container. White bg, 6px black bottom border, 4px/8px padding.</span>
+          </div>
+
+          <div class="anatomy-card">
+            <span class="anatomy-card__num">02</span>
+            <span class="anatomy-card__label">Logo icon</span>
+            <span class="anatomy-card__desc">Computer SVG from the icons library. 13×16px, <code style="font-size:10px; background:var(--color-gray-100); padding:1px 4px;">currentColor</code> fill. Links to homepage.</span>
+          </div>
+
+          <div class="anatomy-card">
+            <span class="anatomy-card__num">03</span>
+            <span class="anatomy-card__label">Nav links</span>
+            <span class="anatomy-card__desc"><code style="font-size:10px; background:var(--color-gray-100); padding:1px 4px;">.btn--secondary</code> — white fill default, black fill on hover. TT Mussels Trial Bold.</span>
+          </div>
+
+          <div class="anatomy-card">
+            <span class="anatomy-card__num">04</span>
+            <span class="anatomy-card__label">Admin Login</span>
+            <span class="anatomy-card__desc">Same <code style="font-size:10px; background:var(--color-gray-100); padding:1px 4px;">.btn--secondary</code> pushed to the right. Links to <code style="font-size:10px; background:var(--color-gray-100); padding:1px 4px;">login.html</code>.</span>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ====================================================
+           SPECS
+           ==================================================== -->
+      <section class="sg-section" id="specs">
+        <div class="sg-section__header">
+          <h2 class="sg-section__title">Specs</h2>
+          <span class="sg-section__tag">Exact values</span>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-default); margin-bottom: var(--space-10);">
+          <div class="spec-row">
+            <span class="spec-key">Background</span>
+            <span class="spec-val">#FFFFFF (true white)</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Bottom border</span>
+            <span class="spec-val">6px solid #000000</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Padding</span>
+            <span class="spec-val">4px top/bottom · 8px left/right</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Layout</span>
+            <span class="spec-val">Flexbox · space-between · center aligned</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Position (live)</span>
+            <span class="spec-val">Fixed to top of viewport</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Width</span>
+            <span class="spec-val">100% viewport width</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Logo icon</span>
+            <span class="spec-val">computer.svg · 13×16px · currentColor</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Nav links</span>
+            <span class="spec-val"><code>.btn--secondary</code> — Portfolio · Blog · Contact</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Right action</span>
+            <span class="spec-val"><code>.btn--secondary</code> — Admin Login → login.html</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Hover transition</span>
+            <span class="spec-val">150ms ease · background-color + color</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Button font</span>
+            <span class="spec-val">TT Mussels Trial · Bold (700) · 16px</span>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ====================================================
+           CODE
+           ==================================================== -->
+      <section class="sg-section" id="code">
+        <div class="sg-section__header">
+          <h2 class="sg-section__title">Code</h2>
+          <span class="sg-section__tag">Copy-ready HTML</span>
+        </div>
+
+        <div class="code-block">&lt;<span class="token-tag">nav</span> <span class="token-attr">class</span>="<span class="token-val">site-nav</span>"&gt;
+
+  &lt;<span class="token-tag">div</span> <span class="token-attr">class</span>="<span class="token-val">site-nav__left</span>"&gt;
+
+    <span class="token-comment">&lt;!-- Logo — icon-alone button from button builder --&gt;</span>
+    &lt;<span class="token-tag">a</span> <span class="token-attr">href</span>="<span class="token-val">/</span>" <span class="token-attr">class</span>="<span class="token-val">btn--secondary</span>"&gt;
+      &lt;<span class="token-tag">svg</span> <span class="token-attr">width</span>="<span class="token-val">1em</span>" <span class="token-attr">height</span>="<span class="token-val">1em</span>" <span class="token-attr">viewBox</span>="<span class="token-val">0 0 16 19</span>" <span class="token-attr">fill</span>="<span class="token-val">none</span>" <span class="token-attr">xmlns</span>="<span class="token-val">http://www.w3.org/2000/svg</span>"&gt;
+        &lt;<span class="token-tag">path</span> <span class="token-attr">d</span>="<span class="token-val">M16 18.9095H0V0.000366211H16V18.9095ZM1.4541 17.4545H13.0908V16.0004H1.4541V17.4545ZM1.4541 14.5453H13.0908V1.45447H1.4541V14.5453ZM4.36328 13.0912H2.90918V11.6361H4.36328V13.0912ZM11.6357 13.0912H7.27246V11.6361H11.6357V13.0912ZM11.6357 10.182H2.90918V2.90955H11.6357V10.182Z" <span class="token-attr">fill</span>="<span class="token-val">currentColor</span>"/&gt;
+      &lt;/<span class="token-tag">svg</span>&gt;
+    &lt;/<span class="token-tag">a</span>&gt;
+
+    <span class="token-comment">&lt;!-- Nav links --&gt;</span>
+    &lt;<span class="token-tag">a</span> <span class="token-attr">href</span>="<span class="token-val">/portfolio</span>" <span class="token-attr">class</span>="<span class="token-val">btn--secondary</span>"&gt;Portfolio&lt;/<span class="token-tag">a</span>&gt;
+    &lt;<span class="token-tag">a</span> <span class="token-attr">href</span>="<span class="token-val">/blog</span>"      <span class="token-attr">class</span>="<span class="token-val">btn--secondary</span>"&gt;Blog&lt;/<span class="token-tag">a</span>&gt;
+    &lt;<span class="token-tag">a</span> <span class="token-attr">href</span>="<span class="token-val">/contact</span>"   <span class="token-attr">class</span>="<span class="token-val">btn--secondary</span>"&gt;Contact&lt;/<span class="token-tag">a</span>&gt;
+
+  &lt;/<span class="token-tag">div</span>&gt;
+
+  &lt;<span class="token-tag">div</span> <span class="token-attr">class</span>="<span class="token-val">site-nav__right</span>"&gt;
+    &lt;<span class="token-tag">a</span> <span class="token-attr">href</span>="<span class="token-val">/login</span>" <span class="token-attr">class</span>="<span class="token-val">btn--secondary</span>"&gt;Admin Login&lt;/<span class="token-tag">a</span>&gt;
+  &lt;/<span class="token-tag">div</span>&gt;
+
+&lt;/<span class="token-tag">nav</span>&gt;</div>
+
+        <h3 class="label" style="margin-top: var(--space-8); margin-bottom: var(--space-4);">Fixed positioning (for live site)</h3>
+        <div class="code-block"><span class="token-comment">/* Add to .site-nav when building real pages */</span>
+.<span class="token-tag">site-nav</span> {
+  <span class="token-attr">position</span>: <span class="token-val">fixed</span>;
+  <span class="token-attr">top</span>: <span class="token-val">0</span>;
+  <span class="token-attr">left</span>: <span class="token-val">0</span>;
+  <span class="token-attr">right</span>: <span class="token-val">0</span>;
+  <span class="token-attr">z-index</span>: <span class="token-val">100</span>;
+}</div>
+
+      </section>
+
+
+    </main>
+  </div>
+
+
+  <script src="js/auth.js"></script>
+  <script>
+    Auth.requireAuth();
+    document.getElementById('logoutBtn').addEventListener('click', () => Auth.logout());
+
+    const sections = document.querySelectorAll('.sg-section');
+    const navLinks = document.querySelectorAll('.sg-nav__link');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(l => l.classList.remove('active'));
+          const a = document.querySelector(`.sg-nav__link[href="#${entry.target.id}"]`);
+          if (a) a.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach(s => observer.observe(s));
+  </script>
+  <script src="js/nav.js"></script>
+
+</body>
+</html>

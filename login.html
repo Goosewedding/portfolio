@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Portfolio Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <main class="login-page">
+    <div class="login-card">
+
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:var(--space-1);">
+        <svg height="36" width="28" viewBox="0 0 241 310" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_login_mac)"><path fill-rule="evenodd" clip-rule="evenodd" d="M15 5V10H10H5V135V260H10H15V285V310H125H235V285V260H238H241V135V10H238C235.067 10 235 9.889 235 5V0H125H15V5ZM15 135V260H125H235V135V10H125H15V135ZM45 35V40H40H35V100V160H40H45V165V170H125H205V165V160H210H215V100V40H210H205V35V30H125H45V35ZM45 100V160H125H205V100V40H125H45V100ZM55 55V60H60H65V55V50H60H55V55ZM75 55V60H80H85V55V50H80H75V55ZM95 55V60H100H105V55V50H100H95V55ZM115 55V60H120H125V55V50H120H115V55ZM135 55V60H140H145V55V50H140H135V55ZM155 55V60H160H165V55V50H160H155V55ZM55 75V80H60H65V75V70H60H55V75ZM75 75V80H80H85V75V70H80H75V75ZM95 75V80H100H105V75V70H100H95V75ZM115 75V80H120H125V75V70H120H115V75ZM55 95V100H60H65V95V90H60H55V95ZM75 95V100H80H85V95V90H80H75V95ZM55 115V120H60H65V115V110H60H55V115ZM75 115V120H80H85V115V110H80H75V115ZM55 135V140H60H65V135V130H60H55V135ZM75 135V140H80H85V135V130H80H75V135ZM95 135V140H100H105V135V130H100H95V135ZM125 215V220H165H205V215V210H165H125V215ZM25 285V300H125H225V285V270H125H25V285Z" fill="#040404"/><path fill-rule="evenodd" clip-rule="evenodd" d="M15 135V260H125H235V135V10H125H15V135ZM45 35V40H40H35V100V160H40H45V165V170H125H205V165V160H210H215V100V40H210H205V35V30H125H45V35ZM45 100V160H125H205V100V40H125H45V100ZM55 55V60H60H65V55V50H60H55V55ZM75 55V60H80H85V55V50H80H75V55ZM95 55V60H100H105V55V50H100H95V55ZM115 55V60H120H125V55V50H120H115V55ZM135 55V60H140H145V55V50H140H135V55ZM155 55V60H160H165V55V50H160H155V55ZM55 75V80H60H65V75V70H60H55V75ZM75 75V80H80H85V75V70H80H75V75ZM95 75V80H100H105V75V70H100H95V75ZM115 75V80H120H125V75V70H120H115V75ZM55 95V100H60H65V95V90H60H55V95ZM75 95V100H80H85V95V90H80H75V95ZM55 115V120H60H65V115V110H60H55V115ZM75 115V120H80H85V115V110H80H75V115ZM55 135V140H60H65V135V130H60H55V135ZM75 135V140H80H85V135V130H80H75V135ZM95 135V140H100H105V135V130H100H95V135ZM125 215V220H165H205V215V210H165H125V215ZM25 285V300H125H225V285V270H125H25V285Z" fill="#FCFCFC"/></g><defs><clipPath id="clip0_login_mac"><rect width="241" height="310" fill="white"/></clipPath></defs></svg>
+        <h1 class="login-card__title" style="margin-bottom:0;">Log In</h1>
+      </div>
+      <p class="login-card__subtitle">Style guide &amp; editor access</p>
+
+      <form class="login-card__form" id="loginForm" novalidate>
+
+        <div class="form-field">
+          <label class="form-label" for="password">Password</label>
+          <input
+            class="form-input"
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter password"
+            autocomplete="current-password"
+            autofocus
+          >
+        </div>
+
+        <p class="login-card__error" id="loginError">Incorrect password. Try again.</p>
+
+        <div style="display:flex; align-items:center; gap:var(--space-4);">
+          <a href="index.html" class="btn--text"><svg width="1em" height="1em" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.86667 0.701768V1.05265H5.5H5.13333V1.40352V1.7544H4.76667H4.4V2.10528V2.45615H4.03333H3.66667V2.80703V3.15791H3.3H2.93333V3.50879V3.85966H2.56667H2.2V4.21054V4.56142H1.83333H1.46667V4.91229V5.26317H1.1H0.733333V5.61405V5.96493H0.366667H0V6.3158V6.66668H0.366667H0.733333V7.01756V7.36844H1.1H1.46667V7.71931V8.07019H1.83333H2.2V8.42107V8.77194H2.56667H2.93333V9.12282V9.4737H3.3H3.66667V9.82458V10.1755H4.03333H4.4V10.5263V10.8772H4.76667H5.13333V11.2281V11.579H5.5C5.85853 11.579 5.86667 11.5837 5.86667 11.7895C5.86667 11.9953 5.87481 12 6.23333 12H6.6V10.386V8.77194H8.79179H10.9836L11.0115 7.49124C11.0268 6.78689 11.0267 5.68163 11.0112 5.0351L10.9831 3.85966H8.79157H6.6V2.10528V0.350891H6.23333H5.86667V0.701768Z" fill="currentColor"/></svg>Back</a>
+          <button class="btn--primary" type="submit">Enter</button>
+        </div>
+
+      </form>
+
+    </div>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script>
+    // If already logged in, skip login
+    if (Auth.isLoggedIn()) {
+      window.location.href = 'styleguide.html';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const password = document.getElementById('password').value;
+      const error    = document.getElementById('loginError');
+
+      if (Auth.login(password)) {
+        window.location.href = 'styleguide.html';
+      } else {
+        error.classList.add('visible');
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+      }
+    });
+  </script>
+
+</body>
+</html>
