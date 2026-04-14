@@ -10,6 +10,10 @@ const ContentBuilder = (() => {
   const IMAGES = [
     'images/page%20builder%20images/alone%20in%20the%20store%20am%20I%20dreaming.png',
     'images/page%20builder%20images/office%20flat.png',
+    'images/page%20builder%20images/Info%20people.png',
+    'images/page%20builder%20images/LeviCaterInfographic.png',
+    'images/page%20builder%20images/SkyInfographic.png',
+    'images/page%20builder%20images/scenic.png',
   ];
 
   const TEXT_STYLES = [
