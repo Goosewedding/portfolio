@@ -663,6 +663,12 @@ const ContentBuilder = (() => {
 
   // ── Image picker ──────────────────────────────────────────
 
+  function driveDirectUrl(input) {
+    const m = input.match(/\/d\/([A-Za-z0-9_-]{10,})/);
+    if (m) return 'https://drive.google.com/uc?export=view&id=' + m[1];
+    return null;
+  }
+
   function openImagePicker(blockId = null) {
     const modal = document.createElement('div');
     modal.className = 'cb-modal';
@@ -672,9 +678,37 @@ const ContentBuilder = (() => {
 
     const heading = document.createElement('p');
     heading.className = 'label';
-    heading.style.marginBottom = 'var(--space-6)';
+    heading.style.marginBottom = 'var(--space-4)';
     heading.textContent = 'Select an Image';
     inner.appendChild(heading);
+
+    // ── URL paste row ──────────────────────────────────────
+    const urlRow = document.createElement('div');
+    urlRow.style.cssText = 'display:flex; gap:var(--space-2); margin-bottom:var(--space-6);';
+
+    const urlInput = document.createElement('input');
+    urlInput.type = 'text';
+    urlInput.placeholder = 'Paste any image URL or Google Drive share link…';
+    urlInput.style.cssText = 'flex:1; padding:6px 8px; border:1px solid #000; font-family:inherit; font-size:13px;';
+
+    const urlBtn = document.createElement('button');
+    urlBtn.className = 'btn--secondary';
+    urlBtn.textContent = 'Add';
+    urlBtn.addEventListener('click', () => {
+      const raw = urlInput.value.trim();
+      if (!raw) return;
+      const src = driveDirectUrl(raw) || raw;
+      if (blockId) {
+        addImageToBlock(blockId, src);
+      } else {
+        addBlock({ type: 'image', images: [{ src, alt: '', scale: 100 }], fill: '#FFFFFF' });
+      }
+      document.body.removeChild(modal);
+    });
+
+    urlRow.appendChild(urlInput);
+    urlRow.appendChild(urlBtn);
+    inner.appendChild(urlRow);
 
     const grid = document.createElement('div');
     grid.className = 'cb-image-grid';
@@ -695,24 +729,27 @@ const ContentBuilder = (() => {
 
     document.body.appendChild(modal);
 
-    grid.innerHTML = '';
-    if (IMAGES.length === 0) {
-      grid.innerHTML = '<p class="caption">No images added yet — add paths to the IMAGES array in content-builder.js.</p>';
-    } else {
-      IMAGES.forEach(src => {
-        const name = decodeURIComponent(src.split('/').pop());
-        const thumb = document.createElement('div');
-        thumb.className = 'cb-image-thumb';
+    grid.innerHTML = '<p class="caption" style="padding:8px;">Loading…</p>';
+
+    loadPickerImages().then(images => {
+      grid.innerHTML = '';
+      if (images.length === 0) {
+        grid.innerHTML = '<p class="caption" style="padding:8px;">No images found. Add images to your Google Drive folder or connect one in GitHub Settings.</p>';
+        return;
+      }
+      images.forEach(({ src, thumb, name }) => {
+        const thumbEl = document.createElement('div');
+        thumbEl.className = 'cb-image-thumb';
         const img = document.createElement('img');
-        img.src = src;
+        img.src = thumb;
         img.alt = name;
-        thumb.appendChild(img);
+        thumbEl.appendChild(img);
         const label = document.createElement('p');
         label.className = 'caption';
         label.style.cssText = 'margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;';
         label.textContent = name;
-        thumb.appendChild(label);
-        thumb.addEventListener('click', () => {
+        thumbEl.appendChild(label);
+        thumbEl.addEventListener('click', () => {
           if (blockId) {
             addImageToBlock(blockId, src);
           } else {
@@ -720,9 +757,39 @@ const ContentBuilder = (() => {
           }
           document.body.removeChild(modal);
         });
-        grid.appendChild(thumb);
+        grid.appendChild(thumbEl);
       });
-    }
+    }).catch(() => {
+      grid.innerHTML = '<p class="caption" style="padding:8px; color:#9A1638;">Failed to load images. Check your Drive settings.</p>';
+    });
+  }
+
+  async function fetchDriveImages() {
+    const folderId = localStorage.getItem('__drive_folder__');
+    const apiKey   = localStorage.getItem('__drive_key__');
+    if (!folderId || !apiKey) return [];
+
+    const q   = encodeURIComponent(`'${folderId}' in parents and mimeType contains 'image/' and trashed = false`);
+    const url = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)&pageSize=100&orderBy=createdTime+desc&key=${apiKey}`;
+
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.files || []).map(f => ({
+      src:   `https://drive.google.com/uc?export=view&id=${f.id}`,
+      thumb: `https://drive.google.com/thumbnail?id=${f.id}&sz=w400`,
+      name:  f.name,
+    }));
+  }
+
+  async function loadPickerImages() {
+    const driveImages = await fetchDriveImages();
+    const localImages = IMAGES.map(src => ({
+      src,
+      thumb: src,
+      name:  decodeURIComponent(src.split('/').pop()),
+    }));
+    return [...driveImages, ...localImages];
   }
 
   // ── Video picker ──────────────────────────────────────────
