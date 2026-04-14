@@ -192,7 +192,7 @@
     modal.innerHTML =
       '<h2 style="margin:0;font-size:16px;">GitHub Settings</h2>' +
       noticeHtml +
-      '<p style="margin:0;font-size:12px;color:#555;">Publish commits <code>js/published-data.js</code> to your repo. Cloudflare Pages auto-deploys on each commit.</p>' +
+      '<p style="margin:0;font-size:12px;color:#555;">Publish commits <code>js/published-data.js</code> to your repo. GitHub Pages auto-deploys on each commit.</p>' +
       mkField('Personal Access Token', 'gh-token', 'password', 'ghp_…', localStorage.getItem('__gh_token__') || '') +
       mkField('Repository', 'gh-repo', 'text', 'username/repo', localStorage.getItem('__gh_repo__') || '') +
       mkField('Branch', 'gh-branch', 'text', 'main', localStorage.getItem('__gh_branch__') || 'main') +

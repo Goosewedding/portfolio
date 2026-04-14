@@ -778,6 +778,17 @@ ul, ol {
   }
 }
 
+/* Top margin for project page headers */
+.page-top {
+  margin-top: 48px;
+}
+
+@media (max-width: 640px) {
+  .page-top {
+    margin-top: 16px;
+  }
+}
+
 
 /* ------------------------------------------------------------
    LOGIN PAGE
@@ -1136,7 +1147,7 @@ ul, ol {
 }
 
 .cb-block--hug-top {
-  margin-top: calc(-1 * var(--space-4));
+  margin-top: calc(-1 * var(--space-4) + 1px);
 }
 
 .cb-block--image {
