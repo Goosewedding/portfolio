@@ -661,13 +661,56 @@ const ContentBuilder = (() => {
     render();
   }
 
-  // ── Image picker ──────────────────────────────────────────
+  // ── Image upload ──────────────────────────────────────────
 
-  function driveDirectUrl(input) {
-    const m = input.match(/\/d\/([A-Za-z0-9_-]{10,})/);
-    if (m) return 'https://drive.google.com/uc?export=view&id=' + m[1];
-    return null;
+  async function uploadImageToGitHub(file) {
+    const token  = localStorage.getItem('__gh_token__');
+    const repo   = localStorage.getItem('__gh_repo__');
+    const branch = localStorage.getItem('__gh_branch__') || 'main';
+    if (!token || !repo) throw new Error('No GitHub token — open GitHub Settings and add your token.');
+
+    const ext      = file.name.split('.').pop();
+    const base     = file.name.replace(/\.[^.]+$/, '').replace(/[^A-Za-z0-9_-]/g, '-');
+    const filename = base + '.' + ext;
+    const apiPath  = 'images/page%20builder%20images/' + encodeURIComponent(filename);
+    const src      = 'https://raw.githubusercontent.com/' + repo + '/' + branch + '/images/page%20builder%20images/' + encodeURIComponent(filename);
+
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    const apiBase = 'https://api.github.com/repos/' + repo + '/contents/' + apiPath;
+    const headers = {
+      'Authorization': 'token ' + token,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+    };
+
+    let sha;
+    const getRes = await fetch(apiBase + '?ref=' + encodeURIComponent(branch), { headers });
+    if (getRes.ok) sha = (await getRes.json()).sha;
+
+    const body = { message: 'Upload image: ' + filename, content: base64, branch };
+    if (sha) body.sha = sha;
+
+    const putRes = await fetch(apiBase, { method: 'PUT', headers, body: JSON.stringify(body) });
+    if (!putRes.ok) {
+      const err = await putRes.json().catch(() => ({}));
+      throw new Error(err.message || 'Upload failed');
+    }
+
+    // Persist so it shows in the picker next time
+    const uploaded = JSON.parse(localStorage.getItem('__uploaded_images__') || '[]');
+    if (!uploaded.includes(src)) { uploaded.unshift(src); }
+    localStorage.setItem('__uploaded_images__', JSON.stringify(uploaded));
+
+    return src;
   }
+
+  // ── Image picker ──────────────────────────────────────────
 
   function openImagePicker(blockId = null) {
     const modal = document.createElement('div');
@@ -682,37 +725,42 @@ const ContentBuilder = (() => {
     heading.textContent = 'Select an Image';
     inner.appendChild(heading);
 
-    // ── URL paste row ──────────────────────────────────────
-    const urlRow = document.createElement('div');
-    urlRow.style.cssText = 'display:flex; gap:var(--space-2); margin-bottom:var(--space-6);';
+    // ── Upload button ──────────────────────────────────────
+    const fileInput = document.createElement('input');
+    fileInput.type   = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+    inner.appendChild(fileInput);
 
-    const urlInput = document.createElement('input');
-    urlInput.type = 'text';
-    urlInput.placeholder = 'Paste any image URL or Google Drive share link…';
-    urlInput.style.cssText = 'flex:1; padding:6px 8px; border:1px solid #000; font-family:inherit; font-size:13px;';
+    const uploadBtn = document.createElement('button');
+    uploadBtn.className = 'btn--secondary';
+    uploadBtn.style.marginBottom = 'var(--space-4)';
+    uploadBtn.textContent = 'Upload from device';
+    uploadBtn.addEventListener('click', () => fileInput.click());
 
-    const urlBtn = document.createElement('button');
-    urlBtn.className = 'btn--secondary';
-    urlBtn.textContent = 'Add';
-    urlBtn.addEventListener('click', () => {
-      const raw = urlInput.value.trim();
-      if (!raw) return;
-      const src = driveDirectUrl(raw) || raw;
-      if (blockId) {
-        addImageToBlock(blockId, src);
-      } else {
-        addBlock({ type: 'image', images: [{ src, alt: '', scale: 100 }], fill: '#FFFFFF' });
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      uploadBtn.textContent = 'Uploading…';
+      uploadBtn.disabled = true;
+      try {
+        const src = await uploadImageToGitHub(file);
+        if (blockId) {
+          addImageToBlock(blockId, src);
+        } else {
+          addBlock({ type: 'image', images: [{ src, alt: '', scale: 100 }], fill: '#FFFFFF' });
+        }
+        document.body.removeChild(modal);
+      } catch (err) {
+        uploadBtn.textContent = err.message || 'Upload failed — try again';
+        uploadBtn.disabled = false;
       }
-      document.body.removeChild(modal);
     });
 
-    urlRow.appendChild(urlInput);
-    urlRow.appendChild(urlBtn);
-    inner.appendChild(urlRow);
+    inner.appendChild(uploadBtn);
 
     const grid = document.createElement('div');
     grid.className = 'cb-image-grid';
-
     inner.appendChild(grid);
 
     const cancel = document.createElement('button');
@@ -734,7 +782,7 @@ const ContentBuilder = (() => {
     loadPickerImages().then(images => {
       grid.innerHTML = '';
       if (images.length === 0) {
-        grid.innerHTML = '<p class="caption" style="padding:8px;">No images found. Add images to your Google Drive folder or connect one in GitHub Settings.</p>';
+        grid.innerHTML = '<p class="caption" style="padding:8px;">No images yet — use "Upload from device" above.</p>';
         return;
       }
       images.forEach(({ src, thumb, name }) => {
@@ -759,37 +807,21 @@ const ContentBuilder = (() => {
         });
         grid.appendChild(thumbEl);
       });
-    }).catch(() => {
-      grid.innerHTML = '<p class="caption" style="padding:8px; color:#9A1638;">Failed to load images. Check your Drive settings.</p>';
     });
   }
 
-  async function fetchDriveImages() {
-    const folderId = localStorage.getItem('__drive_folder__');
-    const apiKey   = localStorage.getItem('__drive_key__');
-    if (!folderId || !apiKey) return [];
-
-    const q   = encodeURIComponent(`'${folderId}' in parents and mimeType contains 'image/' and trashed = false`);
-    const url = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)&pageSize=100&orderBy=createdTime+desc&key=${apiKey}`;
-
-    const res = await fetch(url);
-    if (!res.ok) return [];
-    const data = await res.json();
-    return (data.files || []).map(f => ({
-      src:   `https://drive.google.com/uc?export=view&id=${f.id}`,
-      thumb: `https://drive.google.com/thumbnail?id=${f.id}&sz=w400`,
-      name:  f.name,
-    }));
-  }
-
-  async function loadPickerImages() {
-    const driveImages = await fetchDriveImages();
-    const localImages = IMAGES.map(src => ({
+  function loadPickerImages() {
+    const uploaded = JSON.parse(localStorage.getItem('__uploaded_images__') || '[]').map(src => ({
       src,
       thumb: src,
       name:  decodeURIComponent(src.split('/').pop()),
     }));
-    return [...driveImages, ...localImages];
+    const local = IMAGES.map(src => ({
+      src,
+      thumb: src,
+      name:  decodeURIComponent(src.split('/').pop()),
+    }));
+    return Promise.resolve([...uploaded, ...local]);
   }
 
   // ── Video picker ──────────────────────────────────────────

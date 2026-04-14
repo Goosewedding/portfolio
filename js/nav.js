@@ -196,10 +196,6 @@
       mkField('Personal Access Token', 'gh-token', 'password', 'ghp_…', localStorage.getItem('__gh_token__') || '') +
       mkField('Repository', 'gh-repo', 'text', 'username/repo', localStorage.getItem('__gh_repo__') || '') +
       mkField('Branch', 'gh-branch', 'text', 'main', localStorage.getItem('__gh_branch__') || 'main') +
-      '<hr style="border:none;border-top:1px solid #E5E5E5;margin:4px 0;">' +
-      '<p style="margin:0;font-size:12px;color:#555;">Connect a public Google Drive folder so images appear in the picker automatically.</p>' +
-      mkField('Drive Folder ID', 'drive-folder', 'text', 'Paste folder ID from Drive URL…', localStorage.getItem('__drive_folder__') || '') +
-      mkField('Drive API Key', 'drive-key', 'password', 'AIza…', localStorage.getItem('__drive_key__') || '') +
       '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">' +
         '<button id="gh-cancel" class="btn--secondary">Cancel</button>' +
         '<button id="gh-save" class="btn--secondary">Save</button>' +
@@ -213,13 +209,9 @@
       const t  = modal.querySelector('#gh-token').value.trim();
       const r  = modal.querySelector('#gh-repo').value.trim();
       const b  = modal.querySelector('#gh-branch').value.trim() || 'main';
-      const df = modal.querySelector('#drive-folder').value.trim();
-      const dk = modal.querySelector('#drive-key').value.trim();
-      if (t)  localStorage.setItem('__gh_token__', t);
-      if (r)  localStorage.setItem('__gh_repo__', r);
+      if (t) localStorage.setItem('__gh_token__', t);
+      if (r) localStorage.setItem('__gh_repo__', r);
       localStorage.setItem('__gh_branch__', b);
-      if (df) localStorage.setItem('__drive_folder__', df);
-      if (dk) localStorage.setItem('__drive_key__', dk);
       overlay.remove();
     });
   }
