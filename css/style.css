@@ -1328,6 +1328,10 @@ ul, ol {
   display: block;
 }
 
+.cb-block--video {
+  padding: 1px;
+}
+
 .cb-video-wrap {
   position: relative;
   width: 100%;

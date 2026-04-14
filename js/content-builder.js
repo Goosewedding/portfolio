@@ -333,6 +333,7 @@ const ContentBuilder = (() => {
       wrap.appendChild(imgWrap);
 
     } else if (block.type === 'video') {
+      wrap.classList.add('cb-block--video');
       const embedId = youtubeId(block.url || '');
       const videoWrap = document.createElement('div');
       videoWrap.className = 'cb-video-wrap';
