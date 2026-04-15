@@ -665,7 +665,7 @@ const ContentBuilder = (() => {
 
   function driveDirectUrl(input) {
     const m = input.match(/\/d\/([A-Za-z0-9_-]{10,})/);
-    if (m) return 'https://drive.google.com/uc?export=view&id=' + m[1];
+    if (m) return 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w1600';
     return null;
   }
 
@@ -775,7 +775,7 @@ const ContentBuilder = (() => {
     if (!res.ok) return [];
     const data = await res.json();
     return (data.files || []).map(f => ({
-      src:   `https://drive.google.com/uc?export=view&id=${f.id}`,
+      src:   `https://drive.google.com/thumbnail?id=${f.id}&sz=w1600`,
       thumb: `https://drive.google.com/thumbnail?id=${f.id}&sz=w400`,
       name:  f.name,
     }));
