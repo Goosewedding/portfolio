@@ -213,7 +213,9 @@
       const t  = modal.querySelector('#gh-token').value.trim();
       const r  = modal.querySelector('#gh-repo').value.trim();
       const b  = modal.querySelector('#gh-branch').value.trim() || 'main';
-      const df = modal.querySelector('#drive-folder').value.trim();
+      const dfRaw = modal.querySelector('#drive-folder').value.trim();
+      const dfMatch = dfRaw.match(/\/folders\/([A-Za-z0-9_-]+)/);
+      const df = dfMatch ? dfMatch[1] : dfRaw.split('?')[0].trim();
       const dk = modal.querySelector('#drive-key').value.trim();
       if (t)  localStorage.setItem('__gh_token__', t);
       if (r)  localStorage.setItem('__gh_repo__', r);
