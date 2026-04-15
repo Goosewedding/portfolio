@@ -67,6 +67,18 @@ const Folders = (() => {
   const SVG_CLOSED = `<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 12H0V0H3.5814L4.55814 1H14V12Z" fill="currentColor"/></svg>`;
   const SVG_OPEN   = `<svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.0408 1V2.66667H1.95918L0 10.3333V2.66667V0H3.59184L4.57143 1H14.0408Z" fill="currentColor"/><path d="M14.2041 12H0.489796L2.44898 3.5H16L14.2041 12Z" fill="currentColor"/></svg>`;
 
+  // Flat list of all projects across all folders
+  const ALL_PROJECTS = DATA.flatMap(f => f.projects.map(p => ({ ...p, originalFolder: f.label })));
+
+  function getLabels() {
+    return DATA.map(f => f.label);
+  }
+
+  function getProjectFolder(href) {
+    const f = DATA.find(f => f.projects.some(p => p.href === href));
+    return f ? f.label : null;
+  }
+
   function render(container) {
     const isAdmin = sessionStorage.getItem('portfolio_auth') === 'true';
     container.innerHTML = '';
@@ -91,11 +103,16 @@ const Folders = (() => {
       btn.appendChild(iconOpen);
       btn.appendChild(document.createTextNode(folder.label));
 
-      // Project links
+      // Project links — include projects assigned here via folder override
       const contents = document.createElement('div');
       contents.className = 'folder-contents';
 
-      const sorted = folder.projects.slice().sort((a, b) => {
+      const assigned = ALL_PROJECTS.filter(p => {
+        const override = localStorage.getItem('folder_' + p.href.replace('.html', ''));
+        return override ? override === folder.label : p.originalFolder === folder.label;
+      });
+
+      const sorted = assigned.slice().sort((a, b) => {
         const ra = parseFloat(localStorage.getItem('rank_' + a.href.replace('.html', ''))) || Infinity;
         const rb = parseFloat(localStorage.getItem('rank_' + b.href.replace('.html', ''))) || Infinity;
         return ra - rb;
@@ -142,5 +159,5 @@ const Folders = (() => {
     });
   }
 
-  return { render };
+  return { render, getLabels, getProjectFolder };
 })();

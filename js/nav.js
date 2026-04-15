@@ -94,7 +94,7 @@
 
     try {
       // Gather all admin-editable localStorage keys
-      const PREFIXES = ['cb_', 'title_', 'date_', 'dither_', 'pattern_', 'bg_', 'page_hidden_', 'rank_'];
+      const PREFIXES = ['cb_', 'title_', 'date_', 'dither_', 'pattern_', 'bg_', 'page_hidden_', 'rank_', 'folder_'];
       const data = {};
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -110,7 +110,7 @@
         '(function () {',
         '  var DATA = ' + JSON.stringify(data) + ';',
         "  var VERSION = '" + version + "';",
-        "  var PREFIXES = ['cb_', 'title_', 'date_', 'dither_', 'pattern_', 'bg_', 'page_hidden_', 'rank_'];",
+        "  var PREFIXES = ['cb_', 'title_', 'date_', 'dither_', 'pattern_', 'bg_', 'page_hidden_', 'rank_', 'folder_'];",
         "  if (localStorage.getItem('__pub_v__') !== VERSION) {",
         '    Object.keys(localStorage).forEach(function (k) {',
         "      if (k === 'home_para' || PREFIXES.some(function (p) { return k.indexOf(p) === 0; })) {",

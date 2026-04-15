@@ -903,9 +903,10 @@ const ContentBuilder = (() => {
       fn: c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='2' height='2' fill='${c}'/%3E%3Crect x='2' y='2' width='2' height='2' fill='${c}'/%3E%3C/svg%3E")`,
     },
     {
-      id: 'fine-checker',
-      label: 'Fine',
-      fn: c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3Crect width='1' height='1' fill='${c}'/%3E%3Crect x='1' y='1' width='1' height='1' fill='${c}'/%3E%3C/svg%3E")`,
+      id: 'fence',
+      label: 'Fence',
+      size: '8px 8px',
+      fn: c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8' height='8'%3E%3Crect x='1' y='3' width='1' height='1' fill='${c}'/%3E%3Crect y='4' width='1' height='1' fill='${c}'/%3E%3Cpolygon points='2 7 1 7 1 8 2 8 3 8 4 8 4 7 3 7 3 6 2 6 2 7' fill='${c}'/%3E%3Cpolygon points='4 0 0 0 0 1 1 1 1 2 2 2 2 3 3 3 3 2 4 2 4 1 5 1 5 0 4 0' fill='${c}'/%3E%3Crect x='5' y='1' width='1' height='1' fill='${c}'/%3E%3Cpolygon points='7 3 7 2 6 2 6 3 5 3 5 4 4 4 4 5 5 5 5 6 6 6 6 7 7 7 7 6 8 6 8 5 8 4 8 3 7 3' fill='${c}'/%3E%3Crect x='7' y='7' width='1' height='1' fill='${c}'/%3E%3Crect x='3' y='5' width='1' height='1' fill='${c}'/%3E%3C/svg%3E")`,
     },
     {
       id: 'sparse',
@@ -958,7 +959,9 @@ const ContentBuilder = (() => {
   }
 
   function applyDither(hex, patternId) {
+    const p = DITHER_PATTERNS.find(p => p.id === patternId) || DITHER_PATTERNS[0];
     document.body.style.backgroundImage = ditherSvg(hex, patternId);
+    document.body.style.backgroundSize  = p.size || '';
   }
 
   // keep alias for existing callers
@@ -1134,6 +1137,10 @@ const ContentBuilder = (() => {
     const h1 = document.querySelector('h1.heading-xl');
     if (!h1) return;
 
+    // Only show on known project pages, not on portfolio/index
+    const filename = window.location.pathname.split('/').pop();
+    if (typeof Folders !== 'undefined' && !Folders.getProjectFolder(filename)) return;
+
     const key = visibilityKey();
 
     function isHidden() {
@@ -1158,7 +1165,7 @@ const ContentBuilder = (() => {
     });
 
     // ── Rank field ─────────────────────────────────────────
-    const rankKey = 'rank_' + window.location.pathname.split('/').pop().replace('.html', '');
+    const rankKey = 'rank_' + filename.replace('.html', '');
     const rankWrap = document.createElement('div');
     rankWrap.style.cssText = 'display:flex; align-items:center; gap:6px;';
 
@@ -1186,8 +1193,45 @@ const ContentBuilder = (() => {
     rankWrap.appendChild(rankLabel);
     rankWrap.appendChild(rankInput);
 
+    // ── Folder selector ────────────────────────────────────
+    const folderKey = 'folder_' + filename.replace('.html', '');
+    const folderWrap = document.createElement('div');
+    folderWrap.style.cssText = 'display:flex; align-items:center; gap:6px;';
+
+    const folderLabel = document.createElement('label');
+    folderLabel.className = 'caption';
+    folderLabel.textContent = 'Folder:';
+
+    const folderSelect = document.createElement('select');
+    folderSelect.style.cssText = 'padding:4px 6px; border:1px solid #000; font-family:inherit; font-size:13px; background:#fff;';
+
+    const labels = (typeof Folders !== 'undefined') ? Folders.getLabels() : [];
+    const defaultFolder = (typeof Folders !== 'undefined') ? Folders.getProjectFolder(filename) : null;
+    const savedFolder = localStorage.getItem(folderKey) || defaultFolder;
+
+    labels.forEach(label => {
+      const opt = document.createElement('option');
+      opt.value = label;
+      opt.textContent = label;
+      if (label === savedFolder) opt.selected = true;
+      folderSelect.appendChild(opt);
+    });
+
+    folderSelect.addEventListener('change', () => {
+      const val = folderSelect.value;
+      if (val === defaultFolder) {
+        localStorage.removeItem(folderKey);
+      } else {
+        localStorage.setItem(folderKey, val);
+      }
+    });
+
+    folderWrap.appendChild(folderLabel);
+    folderWrap.appendChild(folderSelect);
+
     row.appendChild(btn);
     row.appendChild(rankWrap);
+    row.appendChild(folderWrap);
     h1.parentElement.appendChild(row);
   }
 
