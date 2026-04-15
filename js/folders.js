@@ -95,7 +95,13 @@ const Folders = (() => {
       const contents = document.createElement('div');
       contents.className = 'folder-contents';
 
-      folder.projects.forEach(project => {
+      const sorted = folder.projects.slice().sort((a, b) => {
+        const ra = parseFloat(localStorage.getItem('rank_' + a.href.replace('.html', ''))) || Infinity;
+        const rb = parseFloat(localStorage.getItem('rank_' + b.href.replace('.html', ''))) || Infinity;
+        return ra - rb;
+      });
+
+      sorted.forEach(project => {
         const slug = project.href.replace('.html', '');
         const hidden = localStorage.getItem('page_hidden_' + slug) === 'true';
 

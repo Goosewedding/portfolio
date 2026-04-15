@@ -1140,9 +1140,11 @@ const ContentBuilder = (() => {
       return localStorage.getItem(key) === 'true';
     }
 
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex; align-items:center; gap:var(--space-3); margin-top:var(--space-3); flex-wrap:wrap;';
+
     const btn = document.createElement('button');
     btn.className = 'btn--secondary';
-    btn.style.marginTop = 'var(--space-3)';
     btn.textContent = isHidden() ? 'Hidden from visitors' : 'Visible to visitors';
 
     btn.addEventListener('click', () => {
@@ -1155,7 +1157,38 @@ const ContentBuilder = (() => {
       btn.textContent = nowHidden ? 'Hidden from visitors' : 'Visible to visitors';
     });
 
-    h1.parentElement.appendChild(btn);
+    // ── Rank field ─────────────────────────────────────────
+    const rankKey = 'rank_' + window.location.pathname.split('/').pop().replace('.html', '');
+    const rankWrap = document.createElement('div');
+    rankWrap.style.cssText = 'display:flex; align-items:center; gap:6px;';
+
+    const rankLabel = document.createElement('label');
+    rankLabel.className = 'caption';
+    rankLabel.textContent = 'Order:';
+
+    const rankInput = document.createElement('input');
+    rankInput.type = 'number';
+    rankInput.min = '1';
+    rankInput.placeholder = '—';
+    rankInput.style.cssText = 'width:52px; padding:4px 6px; border:1px solid #000; font-family:inherit; font-size:13px; text-align:center;';
+    const savedRank = localStorage.getItem(rankKey);
+    if (savedRank) rankInput.value = savedRank;
+
+    rankInput.addEventListener('change', () => {
+      const val = rankInput.value.trim();
+      if (val) {
+        localStorage.setItem(rankKey, val);
+      } else {
+        localStorage.removeItem(rankKey);
+      }
+    });
+
+    rankWrap.appendChild(rankLabel);
+    rankWrap.appendChild(rankInput);
+
+    row.appendChild(btn);
+    row.appendChild(rankWrap);
+    h1.parentElement.appendChild(row);
   }
 
   // ── Date subheading ───────────────────────────────────────
