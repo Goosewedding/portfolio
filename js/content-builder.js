@@ -169,6 +169,38 @@ const ContentBuilder = (() => {
     if (b) { b.content = activeTextEl.innerHTML; saveBlocks(blocks); }
   }
 
+  const HEADER_ICONS = [
+    { label: 'Pages',       src: 'icons/pages.svg'            },
+    { label: 'Page',        src: 'icons/page.svg'             },
+    { label: 'Computer',    src: 'icons/computer.svg'         },
+    { label: 'Folder',      src: 'icons/folder.svg'           },
+    { label: 'Folder Open', src: 'icons/folder-open.svg'      },
+    { label: 'Mac',         src: 'icons/mac45.svg'            },
+    { label: 'Mac 5',       src: 'icons/Mac5.svg'             },
+    { label: '184',         src: 'icons/184.svg'              },
+    { label: '-68',         src: 'icons/-68.svg'              },
+    { label: '-69',         src: 'icons/-69.svg'              },
+    { label: '-72',         src: 'icons/-72.svg'              },
+    { label: '-78',         src: 'icons/-78.svg'              },
+    { label: 'Comm 3',      src: 'icons/Communication3.svg'   },
+    { label: 'Comm 8',      src: 'icons/Communication8.svg'   },
+    { label: 'Comm 11',     src: 'icons/Communication11.svg'  },
+    { label: 'Comm 13',     src: 'icons/Communication13.svg'  },
+    { label: 'Comm 56',     src: 'icons/Communication56.svg'  },
+    { label: 'Misc 7',      src: 'icons/_Ends__Odds7.svg'     },
+    { label: 'Misc 17',     src: 'icons/_Ends__Odds17.svg'    },
+    { label: 'Misc 62',     src: 'icons/_Ends__Odds62.svg'    },
+    { label: 'Arrow Up',    src: 'icons/arrow up.svg'         },
+    { label: 'Arrow Down',  src: 'icons/arrow down.svg'       },
+    { label: 'Arrow Left',  src: 'icons/arrow left.svg'       },
+    { label: 'Arrow Right', src: 'icons/arrow right.svg'      },
+  ];
+
+  const SVG_ARROW_UP   = `<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.58824 0.79469V1.19204H6.17647H5.76471V1.58939V1.98674H5.35294H4.94118V2.38409V2.78144H4.52941H4.11765V3.1788V3.57615H3.70588H3.29412V3.9735V4.37085H2.88235H2.47059V4.7682V5.16555H2.05882H1.64706V5.5629V5.96025H1.23529H0.823529V6.3576V6.75495H0.411765H0V7.15231V7.54966H2.05882H4.11765V9.77482V12H7H9.88235V9.77617V7.55236L11.9618 7.53114L14.0412 7.50992L14.0655 7.11257L14.0898 6.71522L13.6331 6.74248L13.1765 6.76966V6.36499V5.96025H12.7647H12.3529V5.5629V5.16555H11.9412H11.5294V4.7682V4.37085H11.1176H10.7059V3.9735V3.57615H10.2941H9.88235V3.1788V2.78144H9.47059H9.05882V2.38409V1.98674H8.64706H8.23529V1.58939V1.19204H7.82353H7.41176V0.79469V0.397339H7H6.58824V0.79469ZM0.0247059 7.15231C0.0247059 7.3927 0.0401059 7.49109 0.0589647 7.37085C0.0778235 7.25061 0.0778235 7.054 0.0589647 6.93376C0.0401059 6.81352 0.0247059 6.91191 0.0247059 7.15231Z" fill="currentColor"/></svg>`;
+  const SVG_ARROW_DOWN = `<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.11765 2.78144V5.16555H2.05882H0V5.5629V5.96025H0.411765H0.823529V6.3576V6.75495H1.23529H1.64706V7.15231V7.54966H2.05882H2.47059V7.94701V8.34436H2.88235H3.29412V8.74171V9.13906H3.70588H4.11765V9.53641V9.93376H4.52941H4.94118V10.3311V10.7285H5.35294H5.76471V11.1258V11.5232H6.17647C6.57909 11.5232 6.58824 11.5285 6.58824 11.7616C6.58824 11.9947 6.59738 12 7 12C7.40262 12 7.41176 11.9947 7.41176 11.7616C7.41176 11.5285 7.42091 11.5232 7.82353 11.5232H8.23529V11.1258V10.7285H8.64706H9.05882V10.3311V9.93376H9.47059H9.88235V9.53641V9.13906H10.2941H10.7059V8.74171V8.34436H11.1176H11.5294V7.94701V7.54966H11.9412H12.3529V7.15231V6.75495H12.7647H13.1765V6.36174V5.9686L13.6088 5.94452L14.0412 5.92052L14.0654 5.52317L14.0897 5.12582L11.986 5.14831L9.88235 5.1708V2.78407V0.397339H7H4.11765V2.78144ZM0.0247059 5.5629C0.0247059 5.8033 0.0401059 5.90168 0.0589647 5.78144C0.0778235 5.66121 0.0778235 5.4646 0.0589647 5.34436C0.0401059 5.22412 0.0247059 5.3225 0.0247059 5.5629Z" fill="currentColor"/></svg>`;
+
+  const openSettings = new Set();
+
   // ── Render ───────────────────────────────────────────────
 
   function render() {
@@ -184,12 +216,25 @@ const ContentBuilder = (() => {
     });
 
     if (admin) container.appendChild(renderAddBar());
+    renderSectionsList();
   }
 
   function renderBlock(block, index, total, admin, nextBlock) {
     const wrap = document.createElement('div');
     wrap.className = 'cb-block';
     if (block.hugTop) wrap.classList.add('cb-block--hug-top');
+
+    // ── Section block ────────────────────────────────────────
+    if (block.type === 'section') {
+      if (admin) {
+        wrap.style.cssText = 'background-color:rgba(255,255,255,0.5); border:1px dashed #D4D4D4;';
+        wrap.appendChild(renderSectionControls(block.id, index, total, block));
+      } else {
+        wrap.id = 'cb-section-' + block.id;
+        wrap.style.cssText = 'background:transparent; border:none; padding:0; margin:0; height:0; overflow:hidden;';
+      }
+      return wrap;
+    }
 
     // ── Spacer block ─────────────────────────────────────────
     if (block.type === 'spacer') {
@@ -276,9 +321,23 @@ const ContentBuilder = (() => {
       const imgWrap = document.createElement('div');
       imgWrap.className = 'cb-image-wrap';
 
-      // Apply padding setting
-      const pad = block.imagePadding;
-      if (pad === 'centered') {
+      // Apply padding and alignment settings
+      const pad   = block.imagePadding;
+      const align = block.imageAlign || 'left';
+      const hug   = pad === 'hug';
+      const justifyMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
+
+      if (hug) {
+        const maxScale = Math.max(...images.map(i => i.scale || 100));
+        wrap.style.backgroundColor = 'transparent';
+        wrap.style.border = 'none';
+        wrap.style.display = 'flex';
+        wrap.style.justifyContent = justifyMap[align] || 'flex-start';
+        wrap.style.alignItems = 'flex-start';
+        imgWrap.style.backgroundColor = fill;
+        imgWrap.style.border = '1px solid #000000';
+        imgWrap.style.width = maxScale + '%';
+      } else if (pad === 'centered') {
         imgWrap.style.padding = '32px';
         imgWrap.style.display = 'flex';
         imgWrap.style.flexDirection = 'column';
@@ -287,15 +346,28 @@ const ContentBuilder = (() => {
         imgWrap.style.padding = pad + 'px';
       }
 
+      const flow = block.imageFlow || 'vertical';
+      if (flow === 'horizontal') {
+        imgWrap.style.flexDirection = 'row';
+        imgWrap.style.alignItems = 'flex-start';
+      }
+
       images.forEach((imgData, imgIndex) => {
         const imgRow = document.createElement('div');
         imgRow.className = 'cb-image-row';
+        if (flow === 'horizontal') imgRow.style.flex = '1';
 
         const img = document.createElement('img');
         img.src       = imgData.src;
         img.alt       = imgData.alt || '';
         img.className = 'cb-image';
-        img.style.width = (imgData.scale || 100) + '%';
+        if (hug) {
+          img.style.width = '100%';
+        } else {
+          img.style.width = (imgData.scale || 100) + '%';
+          if (align === 'center') { img.style.marginLeft = 'auto'; img.style.marginRight = 'auto'; }
+          else if (align === 'right') { img.style.marginLeft = 'auto'; img.style.marginRight = '0'; }
+        }
         imgRow.appendChild(img);
 
         if (admin) {
@@ -379,8 +451,8 @@ const ContentBuilder = (() => {
     const actions = document.createElement('div');
     actions.className = 'cb-actions';
 
-    if (index > 0)         actions.appendChild(makeBtn('↑ Move Up',   () => moveBlock(id, -1)));
-    if (index < total - 1) actions.appendChild(makeBtn('↓ Move Down', () => moveBlock(id,  1)));
+    if (index > 0)         actions.appendChild(makeArrowBtn(SVG_ARROW_UP,   () => moveBlock(id, -1)));
+    if (index < total - 1) actions.appendChild(makeArrowBtn(SVG_ARROW_DOWN, () => moveBlock(id,  1)));
 
     const hugTopBtn = document.createElement('button');
     hugTopBtn.className = 'btn--secondary cb-scale-btn';
@@ -398,73 +470,141 @@ const ContentBuilder = (() => {
       actions.appendChild(hugBotBtn);
     }
 
-    const del = makeBtn('✕ Remove', () => deleteBlock(id));
-    del.classList.add('cb-btn--delete');
-    actions.appendChild(del);
-    wrap.appendChild(actions);
+    // Settings + Remove group, pushed to the right
+    const rightGroup = document.createElement('div');
+    rightGroup.style.cssText = 'display:flex; align-items:center; gap:32px; margin-left:auto;';
 
-    // Color swatches
-    const swatchLabel = document.createElement('p');
-    swatchLabel.className = 'label';
-    swatchLabel.style.cssText = 'margin-bottom:var(--space-2); color:inherit;';
-    swatchLabel.textContent = 'Fill';
-    wrap.appendChild(swatchLabel);
-
-    const swatches = document.createElement('div');
-    swatches.className = 'cb-swatches';
-
-    COLORS.forEach(color => {
-      const btn = document.createElement('button');
-      btn.className = 'cb-swatch';
-      btn.style.backgroundColor = color.value;
-      btn.title = color.label;
-      if (color.value === currentFill) btn.classList.add('cb-swatch--active');
-      btn.addEventListener('click', () => setFill(id, color.value));
-      swatches.appendChild(btn);
+    const settingsBtn = document.createElement('button');
+    settingsBtn.className = 'btn--secondary cb-scale-btn';
+    settingsBtn.textContent = '⚙ Settings';
+    if (openSettings.has(id)) settingsBtn.classList.add('cb-scale-btn--active');
+    settingsBtn.addEventListener('click', () => {
+      openSettings.has(id) ? openSettings.delete(id) : openSettings.add(id);
+      render();
     });
 
-    wrap.appendChild(swatches);
+    const del = makeBtn('✕ Remove', () => deleteBlock(id));
+    del.classList.add('cb-btn--delete');
 
-    // Image-only controls
-    if (block.type === 'image') {
-      // Padding selector
-      const padLabel = document.createElement('p');
-      padLabel.className = 'label';
-      padLabel.style.cssText = 'margin-bottom:var(--space-2); margin-top:var(--space-3); color:inherit;';
-      padLabel.textContent = 'Padding';
-      wrap.appendChild(padLabel);
+    rightGroup.appendChild(settingsBtn);
+    rightGroup.appendChild(del);
+    actions.appendChild(rightGroup);
 
-      const padRow = document.createElement('div');
-      padRow.style.cssText = 'display:flex; flex-wrap:wrap; gap:var(--space-2);';
+    wrap.appendChild(actions);
 
-      const PAD_OPTIONS = [
-        { label: '0px',    value: '0'        },
-        { label: '1px',    value: '1'        },
-        { label: '8px',    value: '8'        },
-        { label: '16px',   value: '16'       },
-        { label: '32px',   value: '32'       },
-        { label: '64px',   value: '64'       },
-        { label: 'Center', value: 'centered' },
-      ];
+    // Collapsible settings panel
+    if (openSettings.has(id)) {
+      const panel = document.createElement('div');
+      panel.style.cssText = 'padding-top:var(--space-3); display:flex; flex-direction:column; gap:var(--space-3);';
 
-      PAD_OPTIONS.forEach(opt => {
+      // Fill
+      const fillSection = document.createElement('div');
+      const swatchLabel = document.createElement('p');
+      swatchLabel.className = 'label';
+      swatchLabel.style.cssText = 'margin-bottom:var(--space-2); color:inherit;';
+      swatchLabel.textContent = 'Fill';
+      fillSection.appendChild(swatchLabel);
+
+      const swatches = document.createElement('div');
+      swatches.className = 'cb-swatches';
+      COLORS.forEach(color => {
         const btn = document.createElement('button');
-        btn.className = 'btn--secondary cb-scale-btn';
-        btn.textContent = opt.label;
-        if ((block.imagePadding || '1') === opt.value) btn.classList.add('cb-scale-btn--active');
-        btn.addEventListener('click', () => setPadding(block.id, opt.value));
-        padRow.appendChild(btn);
+        btn.className = 'cb-swatch';
+        btn.style.backgroundColor = color.value;
+        btn.title = color.label;
+        if (color.value === currentFill) btn.classList.add('cb-swatch--active');
+        btn.addEventListener('click', () => setFill(id, color.value));
+        swatches.appendChild(btn);
       });
+      fillSection.appendChild(swatches);
+      panel.appendChild(fillSection);
 
-      wrap.appendChild(padRow);
+      // Image-only controls
+      if (block.type === 'image') {
+        // Padding
+        const padSection = document.createElement('div');
+        const padLabel = document.createElement('p');
+        padLabel.className = 'label';
+        padLabel.style.cssText = 'margin-bottom:var(--space-2); color:inherit;';
+        padLabel.textContent = 'Padding';
+        padSection.appendChild(padLabel);
 
-      // Add image button
-      const addImgBtn = document.createElement('button');
-      addImgBtn.className = 'btn--secondary';
-      addImgBtn.style.marginTop = 'var(--space-3)';
-      addImgBtn.textContent = '+ Add Image';
-      addImgBtn.addEventListener('click', () => openImagePicker(block.id));
-      wrap.appendChild(addImgBtn);
+        const padRow = document.createElement('div');
+        padRow.style.cssText = 'display:flex; flex-wrap:wrap; gap:var(--space-2);';
+        const PAD_OPTIONS = [
+          { label: '0px',    value: '0'        },
+          { label: '1px',    value: '1'        },
+          { label: '8px',    value: '8'        },
+          { label: '16px',   value: '16'       },
+          { label: '32px',   value: '32'       },
+          { label: '64px',   value: '64'       },
+          { label: 'Center', value: 'centered' },
+          { label: 'Hug',    value: 'hug'      },
+        ];
+        PAD_OPTIONS.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'btn--secondary cb-scale-btn';
+          btn.textContent = opt.label;
+          if ((block.imagePadding || '1') === opt.value) btn.classList.add('cb-scale-btn--active');
+          btn.addEventListener('click', () => setPadding(block.id, opt.value));
+          padRow.appendChild(btn);
+        });
+        padSection.appendChild(padRow);
+        panel.appendChild(padSection);
+
+        // Align
+        const alignSection = document.createElement('div');
+        const alignLabel = document.createElement('p');
+        alignLabel.className = 'label';
+        alignLabel.style.cssText = 'margin-bottom:var(--space-2); color:inherit;';
+        alignLabel.textContent = 'Align';
+        alignSection.appendChild(alignLabel);
+
+        const alignRow = document.createElement('div');
+        alignRow.style.cssText = 'display:flex; flex-wrap:wrap; gap:var(--space-2);';
+        [{ label: '← Left', value: 'left' }, { label: '⊛ Center', value: 'center' }, { label: 'Right →', value: 'right' }].forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'btn--secondary cb-scale-btn';
+          btn.textContent = opt.label;
+          if ((block.imageAlign || 'left') === opt.value) btn.classList.add('cb-scale-btn--active');
+          btn.addEventListener('click', () => setAlignment(block.id, opt.value));
+          alignRow.appendChild(btn);
+        });
+        alignSection.appendChild(alignRow);
+        panel.appendChild(alignSection);
+
+        // Layout (2+ images only)
+        if (normalizeImages(block).length > 1) {
+          const flowSection = document.createElement('div');
+          const flowLabel = document.createElement('p');
+          flowLabel.className = 'label';
+          flowLabel.style.cssText = 'margin-bottom:var(--space-2); color:inherit;';
+          flowLabel.textContent = 'Layout';
+          flowSection.appendChild(flowLabel);
+
+          const flowRow = document.createElement('div');
+          flowRow.style.cssText = 'display:flex; flex-wrap:wrap; gap:var(--space-2);';
+          [{ label: '↓ Vertical', value: 'vertical' }, { label: '→ Horizontal', value: 'horizontal' }].forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn--secondary cb-scale-btn';
+            btn.textContent = opt.label;
+            if ((block.imageFlow || 'vertical') === opt.value) btn.classList.add('cb-scale-btn--active');
+            btn.addEventListener('click', () => setImageFlow(block.id, opt.value));
+            flowRow.appendChild(btn);
+          });
+          flowSection.appendChild(flowRow);
+          panel.appendChild(flowSection);
+        }
+
+        // Add image button
+        const addImgBtn = document.createElement('button');
+        addImgBtn.className = 'btn--secondary';
+        addImgBtn.textContent = '+ Add Image';
+        addImgBtn.addEventListener('click', () => openImagePicker(block.id));
+        panel.appendChild(addImgBtn);
+      }
+
+      wrap.appendChild(panel);
     }
 
     return wrap;
@@ -477,8 +617,8 @@ const ContentBuilder = (() => {
     const actions = document.createElement('div');
     actions.className = 'cb-actions';
 
-    if (index > 0)         actions.appendChild(makeBtn('↑ Move Up',   () => moveBlock(id, -1)));
-    if (index < total - 1) actions.appendChild(makeBtn('↓ Move Down', () => moveBlock(id,  1)));
+    if (index > 0)         actions.appendChild(makeArrowBtn(SVG_ARROW_UP,   () => moveBlock(id, -1)));
+    if (index < total - 1) actions.appendChild(makeArrowBtn(SVG_ARROW_DOWN, () => moveBlock(id,  1)));
 
     const hugTopBtn = document.createElement('button');
     hugTopBtn.className = 'btn--secondary cb-scale-btn';
@@ -523,6 +663,89 @@ const ContentBuilder = (() => {
     return wrap;
   }
 
+  function renderSectionControls(id, index, total, block) {
+    const wrap = document.createElement('div');
+    wrap.className = 'cb-controls';
+
+    const actions = document.createElement('div');
+    actions.className = 'cb-actions';
+
+    const sectionLabel = document.createElement('span');
+    sectionLabel.className = 'label';
+    sectionLabel.style.cssText = 'color:inherit; flex-shrink:0;';
+    sectionLabel.textContent = '§ Section';
+    actions.appendChild(sectionLabel);
+
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text';
+    titleInput.value = block.sectionTitle || '';
+    titleInput.placeholder = 'Section title…';
+    titleInput.style.cssText = 'padding:4px 6px; border:1px solid #000; font-family:inherit; font-size:13px; flex:1; min-width:0;';
+    titleInput.addEventListener('keydown', e => { if (e.key === 'Enter') titleInput.blur(); });
+    titleInput.addEventListener('blur', () => setSectionTitle(id, titleInput.value.trim()));
+    actions.appendChild(titleInput);
+
+    const rightGroup = document.createElement('div');
+    rightGroup.style.cssText = 'display:flex; align-items:center; gap:var(--space-2); margin-left:auto;';
+
+    if (index > 0)         rightGroup.appendChild(makeArrowBtn(SVG_ARROW_UP,   () => moveBlock(id, -1)));
+    if (index < total - 1) rightGroup.appendChild(makeArrowBtn(SVG_ARROW_DOWN, () => moveBlock(id,  1)));
+
+    const del = makeBtn('✕ Remove', () => deleteBlock(id));
+    del.classList.add('cb-btn--delete');
+    rightGroup.appendChild(del);
+    actions.appendChild(rightGroup);
+
+    wrap.appendChild(actions);
+    return wrap;
+  }
+
+  function setSectionTitle(id, title) {
+    const blocks = loadBlocks();
+    const b = blocks.find(b => b.id === id);
+    if (b) { b.sectionTitle = title; saveBlocks(blocks); }
+    renderSectionsList();
+  }
+
+  function renderSectionsList() {
+    const h1 = document.querySelector('h1.heading-xl');
+    if (!h1) return;
+
+    const existing = document.getElementById('cb-sections-nav');
+    if (existing) existing.remove();
+
+    const blocks = loadBlocks();
+    const sections = blocks.filter(b => b.type === 'section' && b.sectionTitle);
+    if (sections.length < 2) return;
+
+    const iconSize = parseFloat(getComputedStyle(h1).fontSize);
+    const indent   = iconSize + 8; // icon width (≈ font-size, square SVG) + wrapper gap
+
+    const nav = document.createElement('div');
+    nav.id = 'cb-sections-nav';
+    nav.style.cssText = 'margin-top:var(--space-4); display:flex; flex-direction:column; align-items:flex-start; gap:var(--space-1); padding-left:' + indent + 'px;';
+
+    sections.forEach(b => {
+      const link = document.createElement('button');
+      link.className = 'btn--tertiary';
+      link.style.cssText = 'display:flex; align-items:center; gap:6px;';
+
+      const icon = document.createElement('img');
+      icon.src = 'icons/page.svg';
+      icon.style.cssText = 'width:auto; height:1em; flex-shrink:0;';
+      link.appendChild(icon);
+      link.appendChild(document.createTextNode(b.sectionTitle));
+
+      link.addEventListener('click', () => {
+        const target = document.getElementById('cb-section-' + b.id);
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+      nav.appendChild(link);
+    });
+
+    h1.parentElement.parentElement.appendChild(nav);
+  }
+
   function setSpacerHeight(id, height) {
     const blocks = loadBlocks();
     const b = blocks.find(b => b.id === id);
@@ -554,10 +777,16 @@ const ContentBuilder = (() => {
     spacerBtn.textContent = '+ Padding Block';
     spacerBtn.addEventListener('click', () => addBlock({ type: 'spacer', spacerHeight: 32 }));
 
+    const sectionBtn = document.createElement('button');
+    sectionBtn.className = 'btn--secondary';
+    sectionBtn.textContent = '+ Section Block';
+    sectionBtn.addEventListener('click', () => addBlock({ type: 'section', sectionTitle: '' }));
+
     bar.appendChild(textBtn);
     bar.appendChild(imgBtn);
     bar.appendChild(vidBtn);
     bar.appendChild(spacerBtn);
+    bar.appendChild(sectionBtn);
     return bar;
   }
 
@@ -635,6 +864,20 @@ const ContentBuilder = (() => {
     const blocks = loadBlocks();
     const b = blocks.find(b => b.id === id);
     if (b) { b.imagePadding = value; saveBlocks(blocks); }
+    render();
+  }
+
+  function setAlignment(id, value) {
+    const blocks = loadBlocks();
+    const b = blocks.find(b => b.id === id);
+    if (b) { b.imageAlign = value; saveBlocks(blocks); }
+    render();
+  }
+
+  function setImageFlow(id, value) {
+    const blocks = loadBlocks();
+    const b = blocks.find(b => b.id === id);
+    if (b) { b.imageFlow = value; saveBlocks(blocks); }
     render();
   }
 
@@ -886,6 +1129,14 @@ const ContentBuilder = (() => {
     const btn = document.createElement('button');
     btn.className = 'btn--secondary';
     btn.textContent = label;
+    btn.addEventListener('click', onClick);
+    return btn;
+  }
+
+  function makeArrowBtn(svgHtml, onClick) {
+    const btn = document.createElement('button');
+    btn.className = 'btn--secondary';
+    btn.innerHTML = svgHtml;
     btn.addEventListener('click', onClick);
     return btn;
   }
@@ -1230,10 +1481,104 @@ const ContentBuilder = (() => {
     folderWrap.appendChild(folderLabel);
     folderWrap.appendChild(folderSelect);
 
+    // ── Gear button + settings panel ──────────────────────────
+    const SVG_GEAR = `<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 0H8V2H10V4H12V8H10V10H8V12H4V10H2V8H0V4H2V2H4V0ZM4 4H8V8H4V4Z"/></svg>`;
+
+    const gearBtn = document.createElement('button');
+    gearBtn.className = 'btn--secondary';
+    gearBtn.innerHTML = SVG_GEAR;
+    gearBtn.title = 'Header settings';
+    gearBtn.style.cssText = 'padding:0 10px; flex-shrink:0;';
+
+    const panel = document.createElement('div');
+    panel.style.cssText = 'margin-top:var(--space-3); padding:var(--space-3) var(--space-4); border:1px solid #000; background:#fff; flex-direction:column; gap:var(--space-4);';
+    panel.style.display = 'none';
+
+    // Fill section
+    const fillKey  = headerFillKey();
+    const savedFill = localStorage.getItem(fillKey);
+    const titleCard = h1.parentElement.parentElement;
+
+    function applyFill(hex) {
+      titleCard.style.backgroundColor = hex;
+      titleCard.style.color = isDarkFill(hex) ? '#FFFFFF' : '#000000';
+      titleCard.style.borderColor = isDarkFill(hex) ? '#FFFFFF' : '#000000';
+    }
+
+    const fillLabel = document.createElement('p');
+    fillLabel.className = 'label';
+    fillLabel.style.marginBottom = 'var(--space-2)';
+    fillLabel.textContent = 'Header Fill';
+    panel.appendChild(fillLabel);
+    panel.appendChild(makeSwatchRow(savedFill || '#FFFFFF', hex => {
+      localStorage.setItem(fillKey, hex);
+      applyFill(hex);
+    }));
+
+    // Icon section
+    const iconKey   = 'header_icon_' + filename.replace('.html', '');
+    const savedIcon = localStorage.getItem(iconKey) || 'icons/pages.svg';
+
+    const iconLabel = document.createElement('p');
+    iconLabel.className = 'label';
+    iconLabel.style.marginBottom = 'var(--space-2)';
+    iconLabel.textContent = 'Header Icon';
+    panel.appendChild(iconLabel);
+
+    const iconRow = document.createElement('div');
+    iconRow.style.cssText = 'display:flex; flex-wrap:wrap; gap:var(--space-2);';
+    panel.appendChild(iconRow);
+
+    function buildIconButtons(icons) {
+      iconRow.innerHTML = '';
+      icons.forEach(def => {
+        const iconBtn = document.createElement('button');
+        iconBtn.className = 'btn--secondary cb-scale-btn';
+        iconBtn.style.cssText = 'padding:4px 8px; background:#D4D4D4;';
+        iconBtn.title = def.label;
+        if (def.src === savedIcon) iconBtn.classList.add('cb-scale-btn--active');
+
+        const img = document.createElement('img');
+        img.src = def.src;
+        img.alt = def.label;
+        img.style.cssText = 'height:28px; width:auto; display:block;';
+        iconBtn.appendChild(img);
+
+        iconBtn.addEventListener('click', () => {
+          localStorage.setItem(iconKey, def.src);
+          const headerIcon = document.getElementById('cb-header-icon');
+          if (headerIcon) headerIcon.src = def.src;
+          iconRow.querySelectorAll('.cb-scale-btn').forEach(b => b.classList.remove('cb-scale-btn--active'));
+          iconBtn.classList.add('cb-scale-btn--active');
+        });
+
+        iconRow.appendChild(iconBtn);
+      });
+    }
+
+    let iconsLoaded = false;
+    gearBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const isOpen = panel.style.display === 'flex';
+      panel.style.display = isOpen ? 'none' : 'flex';
+      gearBtn.style.background = isOpen ? '' : '#000';
+      gearBtn.style.color = isOpen ? '' : '#fff';
+
+      if (!isOpen && !iconsLoaded) {
+        iconsLoaded = true;
+        fetch('/api/icons')
+          .then(r => r.ok ? r.json() : Promise.reject())
+          .then(icons => buildIconButtons(icons))
+          .catch(() => buildIconButtons(HEADER_ICONS));
+      }
+    });
+
     row.appendChild(btn);
     row.appendChild(rankWrap);
     row.appendChild(folderWrap);
-    h1.parentElement.appendChild(row);
+    row.appendChild(gearBtn);
+    titleCard.appendChild(row);
+    titleCard.appendChild(panel);
   }
 
   // ── Date subheading ───────────────────────────────────────
@@ -1291,10 +1636,28 @@ const ContentBuilder = (() => {
       });
     }
 
-    h1.after(el);
+    h1.parentElement.after(el);
   }
 
   // ── Init ──────────────────────────────────────────────────
+
+  // ── Header fill ───────────────────────────────────────────
+
+  function headerFillKey() {
+    return 'header_fill_' + window.location.pathname.split('/').pop().replace('.html', '');
+  }
+
+  function initHeaderFill() {
+    const h1 = document.querySelector('h1.heading-xl');
+    if (!h1) return;
+    const saved = localStorage.getItem(headerFillKey());
+    if (!saved) return;
+    const titleCard = h1.parentElement.parentElement;
+    titleCard.style.backgroundColor = saved;
+    titleCard.style.color = isDarkFill(saved) ? '#FFFFFF' : '#000000';
+    titleCard.style.borderColor = isDarkFill(saved) ? '#FFFFFF' : '#000000';
+  }
+
 
   function initFolderLabel() {
     const btn = document.querySelector('.page-top .btn--text');
@@ -1311,12 +1674,34 @@ const ContentBuilder = (() => {
     }
   }
 
+  function initPageIcon() {
+    const h1 = document.querySelector('h1.heading-xl');
+    if (!h1) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex; align-items:center; gap:8px;';
+    h1.parentElement.insertBefore(wrapper, h1);
+    wrapper.appendChild(h1);
+
+    const slug = window.location.pathname.split('/').pop().replace('.html', '');
+    const savedSrc = localStorage.getItem('header_icon_' + slug) || 'icons/pages.svg';
+
+    const icon = document.createElement('img');
+    icon.id = 'cb-header-icon';
+    icon.src = savedSrc;
+    icon.alt = '';
+    icon.style.cssText = 'height:' + getComputedStyle(h1).fontSize + '; width:auto; flex-shrink:0;';
+    wrapper.prepend(icon);
+  }
+
   function init() {
     createToolbar();
     initDither();
     initTitle();
+    initPageIcon();
     initDate();
     initVisibility();
+    initHeaderFill();
     initFolderLabel();
     render();
   }

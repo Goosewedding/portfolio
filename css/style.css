@@ -547,6 +547,33 @@ ul, ol {
   text-underline-offset: 3px;
 }
 
+/* Tertiary — gray fill */
+.btn--tertiary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  height: 24px;
+  padding: 0 8px;
+  background-color: var(--color-gray-200);
+  color: #000000;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast),
+              color var(--transition-fast);
+}
+
+.btn--tertiary:hover {
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
 /* Disabled — non-interactive */
 .btn--disabled {
   display: inline-flex;

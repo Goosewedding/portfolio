@@ -11,6 +11,7 @@ const path = require('path');
 const PORT       = 3000;
 const ROOT       = __dirname;
 const IMAGES_DIR = path.join(ROOT, 'images', 'page builder images');
+const ICONS_DIR  = path.join(ROOT, 'icons');
 
 const MIME = {
   '.html': 'text/html',
@@ -53,6 +54,23 @@ const server = http.createServer((req, res) => {
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(images));
+    });
+    return;
+  }
+
+  // ── API: list icons ──────────────────────────────────────
+  if (url === '/api/icons') {
+    fs.readdir(ICONS_DIR, (err, files) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Could not read icons folder' }));
+        return;
+      }
+      const icons = files
+        .filter(f => /\.svg$/i.test(f) && f !== 'NileKroner homepage banner.svg')
+        .map(f => ({ label: f.replace('.svg', ''), src: 'icons/' + f }));
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(icons));
     });
     return;
   }
