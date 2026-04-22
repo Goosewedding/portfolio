@@ -42,8 +42,8 @@
         </svg>
       </a>
       <a href="portfolio.html" class="btn--secondary">Portfolio</a>
-      <a href="#" class="btn--secondary">Blog</a>
-      <a href="#" class="btn--secondary">Contact</a>
+      <a href="https://nilekronerarchive.tumblr.com/" class="btn--secondary" target="_blank" rel="noopener">Blog</a>
+      <a href="contact.html" class="btn--secondary">Contact</a>
     </div>
     <div class="site-nav__right">
       <a href="login.html" class="btn--secondary" id="nav-admin-link">Admin Login</a>
@@ -75,6 +75,14 @@
       <div style="padding:16px 16px 64px 16px;">
       <div id="folder-list" style="display:flex; flex-direction:column; align-items:flex-start; gap:var(--space-2);"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Visit counter -->
+  <div style="position:fixed; bottom:16px; left:0; right:0; display:flex; justify-content:center; padding-inline:8px; pointer-events:none; z-index:100;">
+    <div style="width:496px; max-width:100%; background-color:#000000; border:1px solid #FFFFFF; padding:8px 16px; pointer-events:auto; display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-family:var(--font-display); color:#ffffff;">Visits:</span>
+      <span class="body-base" id="visit-counter" style="color:#ffffff;"></span>
     </div>
   </div>
 
@@ -132,6 +140,37 @@
         const content = para.innerHTML.trim();
         if (content) localStorage.setItem(PARA_KEY, content);
       });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      const SEED_KEY  = 'visit_seed';
+      const COUNT_KEY = 'visit_count';
+      const isAdmin   = sessionStorage.getItem('portfolio_auth') === 'true';
+      const el        = document.getElementById('visit-counter');
+
+      const seed  = parseInt(localStorage.getItem(SEED_KEY)  || '0', 10);
+      const local = parseInt(localStorage.getItem(COUNT_KEY) || '0', 10) + 1;
+      localStorage.setItem(COUNT_KEY, local);
+
+      const total = seed + local;
+      if (el) el.textContent = total.toLocaleString();
+
+      // Admin: click counter to set seed
+      if (isAdmin && el) {
+        el.style.cursor = 'pointer';
+        el.title = 'Click to set visit seed';
+        el.addEventListener('click', () => {
+          const val = prompt('Set visit count seed (added to local count):', seed);
+          if (val === null) return;
+          const n = parseInt(val, 10);
+          if (!isNaN(n)) {
+            localStorage.setItem(SEED_KEY, n);
+            el.textContent = (n + local).toLocaleString();
+          }
+        });
+      }
     })();
   </script>
 

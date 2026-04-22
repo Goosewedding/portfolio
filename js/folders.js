@@ -66,12 +66,38 @@ const Folders = (() => {
 
   const SVG_CLOSED = `<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 12H0V0H3.5814L4.55814 1H14V12Z" fill="currentColor"/></svg>`;
   const SVG_OPEN   = `<svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.0408 1V2.66667H1.95918L0 10.3333V2.66667V0H3.59184L4.57143 1H14.0408Z" fill="currentColor"/><path d="M14.2041 12H0.489796L2.44898 3.5H16L14.2041 12Z" fill="currentColor"/></svg>`;
+  const SVG_GEAR   = `<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 0H8V2H10V4H12V8H10V10H8V12H4V10H2V8H0V4H2V2H4V0ZM4 4H8V8H4V4Z"/></svg>`;
 
   // Flat list of all projects across all folders
   const ALL_PROJECTS = DATA.flatMap(f => f.projects.map(p => ({ ...p, originalFolder: f.label })));
 
+  function getDisplayName(label) {
+    return localStorage.getItem('folder_name_' + label) || label;
+  }
+
+  function getSortedData() {
+    const saved = localStorage.getItem('folder_order');
+    if (!saved) return DATA;
+    try {
+      const order = JSON.parse(saved);
+      return DATA.slice().sort((a, b) => {
+        const ia = order.indexOf(a.label);
+        const ib = order.indexOf(b.label);
+        const ra = ia === -1 ? DATA.indexOf(a) : ia;
+        const rb = ib === -1 ? DATA.indexOf(b) : ib;
+        return ra - rb;
+      });
+    } catch (e) {
+      return DATA;
+    }
+  }
+
+  function saveFolderOrder(sorted) {
+    localStorage.setItem('folder_order', JSON.stringify(sorted.map(f => f.label)));
+  }
+
   function getLabels() {
-    return DATA.map(f => f.label);
+    return getSortedData().map(f => f.label);
   }
 
   function getProjectFolder(href) {
@@ -83,7 +109,9 @@ const Folders = (() => {
     const isAdmin = sessionStorage.getItem('portfolio_auth') === 'true';
     container.innerHTML = '';
 
-    DATA.forEach(folder => {
+    const sortedData = getSortedData();
+
+    sortedData.forEach((folder, index) => {
       const folderItem = document.createElement('div');
       folderItem.className = 'folder-item';
 
@@ -101,7 +129,7 @@ const Folders = (() => {
 
       btn.appendChild(iconClosed);
       btn.appendChild(iconOpen);
-      btn.appendChild(document.createTextNode(folder.label));
+      btn.appendChild(document.createTextNode(getDisplayName(folder.label)));
 
       // Project links — include projects assigned here via folder override
       const contents = document.createElement('div');
@@ -137,7 +165,98 @@ const Folders = (() => {
         contents.appendChild(link);
       });
 
-      folderItem.appendChild(btn);
+      if (isAdmin) {
+        // ── Header row: folder button + gear ──────────────────
+        const headerRow = document.createElement('div');
+        headerRow.style.cssText = 'display:flex; gap:4px; align-items:stretch;';
+
+        btn.style.flex = '1';
+
+        const gearBtn = document.createElement('button');
+        gearBtn.className = 'btn--secondary';
+        gearBtn.innerHTML = SVG_GEAR;
+        gearBtn.title = 'Folder settings';
+        gearBtn.style.cssText = 'padding:0 10px; flex-shrink:0;';
+
+        headerRow.appendChild(btn);
+        headerRow.appendChild(gearBtn);
+
+        // ── Settings panel (hidden by default) ────────────────
+        const panel = document.createElement('div');
+        panel.style.cssText = 'display:none; border:1px solid #000; background:#fff; padding:var(--space-3) var(--space-4); margin-top:4px; flex-wrap:wrap; gap:var(--space-2); align-items:center;';
+
+        const upBtn = document.createElement('button');
+        upBtn.className = 'btn--secondary';
+        upBtn.textContent = '↑ Move Up';
+        upBtn.disabled = index === 0;
+        upBtn.addEventListener('click', () => {
+          const order = getSortedData();
+          [order[index - 1], order[index]] = [order[index], order[index - 1]];
+          saveFolderOrder(order);
+          render(container);
+        });
+
+        const downBtn = document.createElement('button');
+        downBtn.className = 'btn--secondary';
+        downBtn.textContent = '↓ Move Down';
+        downBtn.disabled = index === sortedData.length - 1;
+        downBtn.addEventListener('click', () => {
+          const order = getSortedData();
+          [order[index], order[index + 1]] = [order[index + 1], order[index]];
+          saveFolderOrder(order);
+          render(container);
+        });
+
+        const divider = document.createElement('div');
+        divider.style.cssText = 'width:1px; align-self:stretch; background:#D4D4D4; margin:0 var(--space-1);';
+
+        const nameLabel = document.createElement('span');
+        nameLabel.className = 'caption';
+        nameLabel.textContent = 'Name';
+        nameLabel.style.cssText = 'flex-shrink:0;';
+
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.value = getDisplayName(folder.label);
+        nameInput.style.cssText = 'padding:4px 6px; border:1px solid #000; font-family:inherit; font-size:13px; min-width:120px;';
+        nameInput.addEventListener('keydown', e => {
+          if (e.key === 'Enter') saveBtn.click();
+        });
+
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'btn--secondary';
+        saveBtn.textContent = 'Save';
+        saveBtn.addEventListener('click', () => {
+          const val = nameInput.value.trim();
+          if (val && val !== folder.label) {
+            localStorage.setItem('folder_name_' + folder.label, val);
+          } else if (!val || val === folder.label) {
+            localStorage.removeItem('folder_name_' + folder.label);
+          }
+          render(container);
+        });
+
+        panel.appendChild(upBtn);
+        panel.appendChild(downBtn);
+        panel.appendChild(divider);
+        panel.appendChild(nameLabel);
+        panel.appendChild(nameInput);
+        panel.appendChild(saveBtn);
+
+        gearBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          const isOpen = panel.style.display === 'flex';
+          panel.style.display = isOpen ? 'none' : 'flex';
+          gearBtn.style.background = isOpen ? '' : '#000';
+          gearBtn.style.color = isOpen ? '' : '#fff';
+        });
+
+        folderItem.appendChild(headerRow);
+        folderItem.appendChild(panel);
+      } else {
+        folderItem.appendChild(btn);
+      }
+
       folderItem.appendChild(contents);
       container.appendChild(folderItem);
     });
@@ -147,10 +266,8 @@ const Folders = (() => {
     container.querySelectorAll('.btn-icon-folder').forEach(btn => {
       btn.addEventListener('click', () => {
         const isOpen = btn.classList.toggle('is-open');
-        const fc = btn.nextElementSibling;
-        if (fc && fc.classList.contains('folder-contents')) {
-          fc.classList.toggle('is-open', isOpen);
-        }
+        const fc = btn.closest('.folder-item').querySelector('.folder-contents');
+        if (fc) fc.classList.toggle('is-open', isOpen);
         if (isOpen && folderSound) {
           folderSound.currentTime = 0;
           folderSound.play().catch(() => {});
@@ -159,5 +276,5 @@ const Folders = (() => {
     });
   }
 
-  return { render, getLabels, getProjectFolder };
+  return { render, getLabels, getProjectFolder, getDisplayName };
 })();

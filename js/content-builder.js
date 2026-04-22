@@ -195,7 +195,7 @@ const ContentBuilder = (() => {
     if (block.type === 'spacer') {
       const height = block.spacerHeight || 32;
       if (admin) {
-        wrap.style.cssText = 'background-color:#FAFAFA; border:1px dashed #D4D4D4;';
+        wrap.style.cssText = 'background-color:rgba(255,255,255,0.5); border:1px dashed #D4D4D4;';
         wrap.appendChild(renderSpacerControls(block.id, index, total, block, nextBlock));
         const preview = document.createElement('div');
         preview.style.height = height + 'px';
@@ -438,6 +438,7 @@ const ContentBuilder = (() => {
       padRow.style.cssText = 'display:flex; flex-wrap:wrap; gap:var(--space-2);';
 
       const PAD_OPTIONS = [
+        { label: '0px',    value: '0'        },
         { label: '1px',    value: '1'        },
         { label: '8px',    value: '8'        },
         { label: '16px',   value: '16'       },
@@ -1212,7 +1213,7 @@ const ContentBuilder = (() => {
     labels.forEach(label => {
       const opt = document.createElement('option');
       opt.value = label;
-      opt.textContent = label;
+      opt.textContent = (typeof Folders !== 'undefined') ? Folders.getDisplayName(label) : label;
       if (label === savedFolder) opt.selected = true;
       folderSelect.appendChild(opt);
     });
@@ -1295,12 +1296,28 @@ const ContentBuilder = (() => {
 
   // ── Init ──────────────────────────────────────────────────
 
+  function initFolderLabel() {
+    const btn = document.querySelector('.page-top .btn--text');
+    if (!btn) return;
+    const filename = window.location.pathname.split('/').pop().replace('.html', '');
+    const saved = localStorage.getItem('folder_' + filename);
+    if (!saved) return;
+    for (let i = btn.childNodes.length - 1; i >= 0; i--) {
+      const node = btn.childNodes[i];
+      if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+        node.textContent = node.textContent.replace(node.textContent.trim(), saved);
+        break;
+      }
+    }
+  }
+
   function init() {
     createToolbar();
     initDither();
     initTitle();
     initDate();
     initVisibility();
+    initFolderLabel();
     render();
   }
 
