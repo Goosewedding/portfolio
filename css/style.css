@@ -319,6 +319,18 @@ ul, ol {
   letter-spacing: var(--tracking-tight);
 }
 
+@media (max-width: 640px) {
+  .heading-xl { font-size: var(--text-2xl); }
+}
+
+.cb-spacer { height: var(--spacer-h, 32px); }
+.cb-header-icon { margin-top: 4px; }
+
+@media (max-width: 640px) {
+  .cb-spacer { height: calc(var(--spacer-h, 32px) / 2); }
+  .cb-header-icon { margin-top: 2px; }
+}
+
 .heading-lg {
   font-family: var(--font-display);
   font-size: var(--text-2xl);
@@ -546,6 +558,9 @@ ul, ol {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+.btn--text--black { color: var(--color-black); }
+.btn--text--white { color: #ffffff; }
 
 /* Tertiary — gray fill */
 .btn--tertiary {

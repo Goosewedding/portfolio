@@ -246,7 +246,9 @@ const ContentBuilder = (() => {
         preview.style.height = height + 'px';
         wrap.appendChild(preview);
       } else {
-        wrap.style.cssText = 'background:transparent; border:none; height:' + height + 'px;';
+        wrap.classList.add('cb-spacer');
+        wrap.style.cssText = 'background:transparent; border:none; padding:0;';
+        wrap.style.setProperty('--spacer-h', height + 'px');
       }
       return wrap;
     }
@@ -718,16 +720,14 @@ const ContentBuilder = (() => {
     const sections = blocks.filter(b => b.type === 'section' && b.sectionTitle);
     if (sections.length < 2) return;
 
-    const iconSize = parseFloat(getComputedStyle(h1).fontSize);
-    const indent   = iconSize + 8; // icon width (≈ font-size, square SVG) + wrapper gap
-
     const nav = document.createElement('div');
     nav.id = 'cb-sections-nav';
-    nav.style.cssText = 'margin-top:var(--space-4); display:flex; flex-direction:column; align-items:flex-start; gap:var(--space-1); padding-left:' + indent + 'px;';
+    nav.className = 'page-content page-content--wide';
+    nav.style.cssText = 'margin-top:var(--space-4); display:flex; flex-direction:column; align-items:flex-start; gap:var(--space-1);';
 
     sections.forEach(b => {
       const link = document.createElement('button');
-      link.className = 'btn--tertiary';
+      link.className = 'btn--primary';
       link.style.cssText = 'display:flex; align-items:center; gap:6px;';
 
       const icon = document.createElement('img');
@@ -743,7 +743,7 @@ const ContentBuilder = (() => {
       nav.appendChild(link);
     });
 
-    h1.parentElement.parentElement.appendChild(nav);
+    h1.parentElement.parentElement.insertAdjacentElement('afterend', nav);
   }
 
   function setSpacerHeight(id, height) {
@@ -1145,49 +1145,39 @@ const ContentBuilder = (() => {
 
   const DITHER_PATTERNS = [
     {
-      id: 'dot',
-      label: 'Dot',
+      id: 'dot',      label: 'Dot',      w: 5, h: 5,
       fn: c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='5' height='5'%3E%3Crect width='2' height='2' fill='${c}'/%3E%3C/svg%3E")`,
     },
     {
-      id: 'checker',
-      label: 'Checker',
+      id: 'checker',  label: 'Checker',  w: 4, h: 4,
       fn: c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='2' height='2' fill='${c}'/%3E%3Crect x='2' y='2' width='2' height='2' fill='${c}'/%3E%3C/svg%3E")`,
     },
     {
-      id: 'fence',
-      label: 'Fence',
-      size: '8px 8px',
+      id: 'fence',    label: 'Fence',    w: 8, h: 8,
       fn: c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8' height='8'%3E%3Crect x='1' y='3' width='1' height='1' fill='${c}'/%3E%3Crect y='4' width='1' height='1' fill='${c}'/%3E%3Cpolygon points='2 7 1 7 1 8 2 8 3 8 4 8 4 7 3 7 3 6 2 6 2 7' fill='${c}'/%3E%3Cpolygon points='4 0 0 0 0 1 1 1 1 2 2 2 2 3 3 3 3 2 4 2 4 1 5 1 5 0 4 0' fill='${c}'/%3E%3Crect x='5' y='1' width='1' height='1' fill='${c}'/%3E%3Cpolygon points='7 3 7 2 6 2 6 3 5 3 5 4 4 4 4 5 5 5 5 6 6 6 6 7 7 7 7 6 8 6 8 5 8 4 8 3 7 3' fill='${c}'/%3E%3Crect x='7' y='7' width='1' height='1' fill='${c}'/%3E%3Crect x='3' y='5' width='1' height='1' fill='${c}'/%3E%3C/svg%3E")`,
     },
     {
-      id: 'sparse',
-      label: 'Sparse',
+      id: 'sparse',   label: 'Sparse',   w: 8, h: 8,
       fn: c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='1' height='1' fill='${c}'/%3E%3C/svg%3E")`,
     },
     {
-      id: 'h-lines',
-      label: 'H-Lines',
+      id: 'h-lines',  label: 'H-Lines',  w: 1, h: 4,
       fn: c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='4'%3E%3Crect width='1' height='1' fill='${c}'/%3E%3C/svg%3E")`,
     },
     {
-      id: 'v-lines',
-      label: 'V-Lines',
+      id: 'v-lines',  label: 'V-Lines',  w: 4, h: 1,
       fn: c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='1'%3E%3Crect width='1' height='1' fill='${c}'/%3E%3C/svg%3E")`,
     },
     {
-      id: 'diagonal',
-      label: 'Diag',
+      id: 'diagonal', label: 'Diag',     w: 4, h: 4,
       fn: c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect x='0' y='0' width='1' height='1' fill='${c}'/%3E%3Crect x='1' y='1' width='1' height='1' fill='${c}'/%3E%3Crect x='2' y='2' width='1' height='1' fill='${c}'/%3E%3Crect x='3' y='3' width='1' height='1' fill='${c}'/%3E%3C/svg%3E")`,
     },
     {
-      id: 'anti-diagonal',
-      label: 'Anti',
+      id: 'anti-diagonal', label: 'Anti', w: 4, h: 4,
       fn: c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect x='3' y='0' width='1' height='1' fill='${c}'/%3E%3Crect x='2' y='1' width='1' height='1' fill='${c}'/%3E%3Crect x='1' y='2' width='1' height='1' fill='${c}'/%3E%3Crect x='0' y='3' width='1' height='1' fill='${c}'/%3E%3C/svg%3E")`,
     },
     {
-      id: 'crosshatch',
-      label: 'Cross',
+      id: 'crosshatch', label: 'Cross',  w: 4, h: 4,
       fn: c => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='1' fill='${c}'/%3E%3Crect width='1' height='4' fill='${c}'/%3E%3C/svg%3E")`,
     },
   ];
@@ -1200,6 +1190,10 @@ const ContentBuilder = (() => {
     return 'pattern_' + window.location.pathname.split('/').pop().replace('.html', '');
   }
 
+  function ditherScaleKey() {
+    return 'dither_scale_' + window.location.pathname.split('/').pop().replace('.html', '');
+  }
+
   function bgKey() {
     return 'bg_' + window.location.pathname.split('/').pop().replace('.html', '');
   }
@@ -1210,10 +1204,11 @@ const ContentBuilder = (() => {
     return p.fn(c);
   }
 
-  function applyDither(hex, patternId) {
+  function applyDither(hex, patternId, scale) {
+    if (scale === undefined) scale = parseFloat(localStorage.getItem(ditherScaleKey()) || '1');
     const p = DITHER_PATTERNS.find(p => p.id === patternId) || DITHER_PATTERNS[0];
     document.body.style.backgroundImage = ditherSvg(hex, patternId);
-    document.body.style.backgroundSize  = p.size || '';
+    document.body.style.backgroundSize  = scale === 1 ? '' : `${p.w * scale}px ${p.h * scale}px`;
   }
 
   // keep alias for existing callers
@@ -1282,7 +1277,8 @@ const ContentBuilder = (() => {
     const savedPattern = localStorage.getItem(patternKey()) || 'dot';
     const savedBg      = localStorage.getItem(bgKey());
 
-    applyDither(savedDither || '#000000', savedPattern);
+    const savedScale = parseFloat(localStorage.getItem(ditherScaleKey()) || '1');
+    applyDither(savedDither || '#000000', savedPattern, savedScale);
     if (savedBg) applyBgColor(savedBg);
 
     if (!isAdmin()) return;
@@ -1321,6 +1317,33 @@ const ContentBuilder = (() => {
     });
 
     bar.appendChild(patternRow);
+
+    // Pattern scale
+    const scaleLabel = document.createElement('p');
+    scaleLabel.className = 'label';
+    scaleLabel.style.cssText = 'margin-top:var(--space-4); margin-bottom:var(--space-2);';
+    scaleLabel.textContent = 'Pattern Scale';
+    bar.appendChild(scaleLabel);
+
+    const scaleRow = document.createElement('div');
+    scaleRow.style.cssText = 'display:flex; gap:var(--space-2);';
+    const currentScale = parseFloat(localStorage.getItem(ditherScaleKey()) || '1');
+
+    [1, 1.5, 2, 4].forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'btn--secondary cb-scale-btn';
+      btn.textContent = s + 'x';
+      if (s === currentScale) btn.classList.add('cb-scale-btn--active');
+      btn.addEventListener('click', () => {
+        scaleRow.querySelectorAll('.cb-scale-btn').forEach(b => b.classList.remove('cb-scale-btn--active'));
+        btn.classList.add('cb-scale-btn--active');
+        localStorage.setItem(ditherScaleKey(), s);
+        applyDither(localStorage.getItem(ditherKey()) || '#000000', localStorage.getItem(patternKey()) || 'dot', s);
+      });
+      scaleRow.appendChild(btn);
+    });
+
+    bar.appendChild(scaleRow);
 
     // Dither color
     const ditherLabel = document.createElement('p');
@@ -1495,14 +1518,22 @@ const ContentBuilder = (() => {
     panel.style.display = 'none';
 
     // Fill section
-    const fillKey  = headerFillKey();
-    const savedFill = localStorage.getItem(fillKey);
-    const titleCard = h1.parentElement.parentElement;
+    const fillKey      = headerFillKey();
+    const opacityKey   = 'header_opacity_' + filename.replace('.html', '');
+    const textColorKey = 'header_text_color_' + filename.replace('.html', '');
+    const savedFill    = localStorage.getItem(fillKey);
+    const titleCard    = h1.parentElement;
 
-    function applyFill(hex) {
-      titleCard.style.backgroundColor = hex;
-      titleCard.style.color = isDarkFill(hex) ? '#FFFFFF' : '#000000';
+    function applyFill(hex, opacity) {
+      if (opacity === undefined) opacity = parseInt(localStorage.getItem(opacityKey) ?? '100', 10);
+      const r = parseInt(hex.slice(1,3), 16);
+      const g = parseInt(hex.slice(3,5), 16);
+      const b = parseInt(hex.slice(5,7), 16);
+      titleCard.style.backgroundColor = opacity < 100 ? `rgba(${r},${g},${b},${opacity/100})` : hex;
       titleCard.style.borderColor = isDarkFill(hex) ? '#FFFFFF' : '#000000';
+      const savedTextColor = localStorage.getItem(textColorKey);
+      const textColor = savedTextColor || (isDarkFill(hex) ? '#FFFFFF' : '#000000');
+      h1.style.color = textColor;
     }
 
     const fillLabel = document.createElement('p');
@@ -1513,6 +1544,54 @@ const ContentBuilder = (() => {
     panel.appendChild(makeSwatchRow(savedFill || '#FFFFFF', hex => {
       localStorage.setItem(fillKey, hex);
       applyFill(hex);
+    }));
+
+    // Opacity slider
+    const opacityLabel = document.createElement('p');
+    opacityLabel.className = 'label';
+    opacityLabel.style.cssText = 'margin-bottom:var(--space-2); margin-top:var(--space-3);';
+    opacityLabel.textContent = 'Opacity';
+    panel.appendChild(opacityLabel);
+
+    const opacityRow = document.createElement('div');
+    opacityRow.style.cssText = 'display:flex; align-items:center; gap:var(--space-2);';
+
+    const savedOpacity = parseInt(localStorage.getItem(opacityKey) ?? '100', 10);
+    const opacitySlider = document.createElement('input');
+    opacitySlider.type = 'range';
+    opacitySlider.min = '0';
+    opacitySlider.max = '100';
+    opacitySlider.value = savedOpacity;
+    opacitySlider.style.cssText = 'flex:1;';
+
+    const opacityDisplay = document.createElement('span');
+    opacityDisplay.className = 'label';
+    opacityDisplay.style.cssText = 'width:3em; text-align:right;';
+    opacityDisplay.textContent = savedOpacity + '%';
+
+    opacitySlider.addEventListener('input', () => {
+      const val = parseInt(opacitySlider.value, 10);
+      opacityDisplay.textContent = val + '%';
+      localStorage.setItem(opacityKey, val);
+      applyFill(localStorage.getItem(fillKey) || '#FFFFFF', val);
+    });
+
+    opacityRow.appendChild(opacitySlider);
+    opacityRow.appendChild(opacityDisplay);
+    panel.appendChild(opacityRow);
+
+    // Text color
+    const textColorLabel = document.createElement('p');
+    textColorLabel.className = 'label';
+    textColorLabel.style.cssText = 'margin-bottom:var(--space-2); margin-top:var(--space-3);';
+    textColorLabel.textContent = 'Header Text Color';
+    panel.appendChild(textColorLabel);
+    const savedTextColor = localStorage.getItem(textColorKey);
+    panel.appendChild(makeSwatchRow(savedTextColor || (isDarkFill(savedFill || '#FFFFFF') ? '#FFFFFF' : '#000000'), hex => {
+      localStorage.setItem(textColorKey, hex);
+      h1.style.color = hex;
+      const backLink = titleCard.querySelector('.btn--secondary');
+      if (backLink) backLink.style.color = hex;
     }));
 
     // Icon section
@@ -1555,6 +1634,38 @@ const ContentBuilder = (() => {
         iconRow.appendChild(iconBtn);
       });
     }
+
+    // Folder button style
+    const folderStyleKey = 'header_folder_style_' + filename.replace('.html', '');
+    const savedFolderStyle = localStorage.getItem(folderStyleKey) || 'black';
+    const backLink = titleCard.querySelector('.btn--text');
+    if (backLink) backLink.classList.add('btn--text--' + savedFolderStyle);
+
+    const folderStyleLabel = document.createElement('p');
+    folderStyleLabel.className = 'label';
+    folderStyleLabel.style.cssText = 'margin-bottom:var(--space-2); margin-top:var(--space-3);';
+    folderStyleLabel.textContent = 'Folder Button';
+    panel.appendChild(folderStyleLabel);
+
+    const folderStyleRow = document.createElement('div');
+    folderStyleRow.style.cssText = 'display:flex; gap:var(--space-2);';
+    ['black', 'white'].forEach(variant => {
+      const btn = document.createElement('button');
+      btn.className = 'btn--secondary cb-scale-btn';
+      btn.textContent = variant.charAt(0).toUpperCase() + variant.slice(1);
+      if (variant === savedFolderStyle) btn.classList.add('cb-scale-btn--active');
+      btn.addEventListener('click', () => {
+        folderStyleRow.querySelectorAll('.cb-scale-btn').forEach(b => b.classList.remove('cb-scale-btn--active'));
+        btn.classList.add('cb-scale-btn--active');
+        localStorage.setItem(folderStyleKey, variant);
+        if (backLink) {
+          backLink.classList.remove('btn--text--black', 'btn--text--white');
+          backLink.classList.add('btn--text--' + variant);
+        }
+      });
+      folderStyleRow.appendChild(btn);
+    });
+    panel.appendChild(folderStyleRow);
 
     let iconsLoaded = false;
     gearBtn.addEventListener('click', e => {
@@ -1650,12 +1761,22 @@ const ContentBuilder = (() => {
   function initHeaderFill() {
     const h1 = document.querySelector('h1.heading-xl');
     if (!h1) return;
+    const slug    = window.location.pathname.split('/').pop().replace('.html', '');
+    const titleCard = h1.closest('.page-top');
+    const backLink  = document.querySelector('.page-top .btn--text');
+    const savedFolderStyle = localStorage.getItem('header_folder_style_' + slug) || 'black';
+    if (backLink) backLink.classList.add('btn--text--' + savedFolderStyle);
     const saved = localStorage.getItem(headerFillKey());
     if (!saved) return;
-    const titleCard = h1.parentElement.parentElement;
-    titleCard.style.backgroundColor = saved;
-    titleCard.style.color = isDarkFill(saved) ? '#FFFFFF' : '#000000';
+    const opacity = parseInt(localStorage.getItem('header_opacity_' + slug) ?? '100', 10);
+    const r = parseInt(saved.slice(1,3), 16);
+    const g = parseInt(saved.slice(3,5), 16);
+    const b = parseInt(saved.slice(5,7), 16);
+    const savedTextColor = localStorage.getItem('header_text_color_' + slug);
+    titleCard.style.backgroundColor = opacity < 100 ? `rgba(${r},${g},${b},${opacity/100})` : saved;
     titleCard.style.borderColor = isDarkFill(saved) ? '#FFFFFF' : '#000000';
+    const textColor = savedTextColor || (isDarkFill(saved) ? '#FFFFFF' : '#000000');
+    h1.style.color = textColor;
   }
 
 
@@ -1679,7 +1800,7 @@ const ContentBuilder = (() => {
     if (!h1) return;
 
     const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'display:flex; align-items:center; gap:8px;';
+    wrapper.style.cssText = 'display:flex; align-items:flex-start; gap:8px;';
     h1.parentElement.insertBefore(wrapper, h1);
     wrapper.appendChild(h1);
 
@@ -1690,6 +1811,7 @@ const ContentBuilder = (() => {
     icon.id = 'cb-header-icon';
     icon.src = savedSrc;
     icon.alt = '';
+    icon.className = 'cb-header-icon';
     icon.style.cssText = 'height:' + getComputedStyle(h1).fontSize + '; width:auto; flex-shrink:0;';
     wrapper.prepend(icon);
   }
