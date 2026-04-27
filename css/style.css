@@ -353,6 +353,12 @@ ul, ol {
   line-height: var(--leading-snug);
 }
 
+@media (max-width: 640px) {
+  .heading-lg { font-size: var(--text-xl); }
+  .heading-md { font-size: var(--text-lg); }
+  .heading-sm { font-size: var(--text-base); }
+}
+
 /* Body — PP Neue Bit */
 .body-lg {
   font-family: var(--font-body);
@@ -373,6 +379,12 @@ ul, ol {
   font-size: 16pt;
   font-weight: var(--weight-regular);
   line-height: var(--leading-normal);
+}
+
+@media (max-width: 640px) {
+  .body-lg   { font-size: 16pt; }
+  .body-base { font-size: 14pt; }
+  .body-sm   { font-size: 12pt; }
 }
 
 /* Labels & Captions */

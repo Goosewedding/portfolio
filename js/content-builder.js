@@ -84,6 +84,18 @@ const ContentBuilder = (() => {
     return Math.random().toString(36).slice(2, 9);
   }
 
+  function findBlockInArray(blocks, id) {
+    const top = blocks.find(b => b.id === id);
+    if (top) return top;
+    for (const b of blocks) {
+      if (b.type === 'group' && b.children) {
+        const child = b.children.find(c => c.id === id);
+        if (child) return child;
+      }
+    }
+    return null;
+  }
+
   function isDarkFill(hex) {
     const c = COLORS.find(c => c.value === hex);
     return c ? c.dark : false;
@@ -165,7 +177,7 @@ const ContentBuilder = (() => {
     if (!activeTextEl) return;
     const id = activeTextEl.dataset.blockId;
     const blocks = loadBlocks();
-    const b = blocks.find(b => b.id === id);
+    const b = findBlockInArray(blocks, id);
     if (b) { b.content = activeTextEl.innerHTML; saveBlocks(blocks); }
   }
 
@@ -261,61 +273,12 @@ const ContentBuilder = (() => {
     if (admin) wrap.appendChild(renderControls(block.id, index, total, fill, block, nextBlock));
 
     if (block.type === 'text') {
-      const el = document.createElement('div');
-      el.className = 'cb-text';
+      const el = buildTextEl(block, admin);
       el.style.color = dark ? '#FFFFFF' : '#000000';
-      el.dataset.blockId = block.id;
-
-      // Build paragraph content
-      if (block.content) {
-        el.innerHTML = block.content;
-      } else if (admin) {
-        const p = document.createElement('div');
-        p.className = 'body-base';
-        p.textContent = 'Click to edit…';
-        el.appendChild(p);
-      }
-
-      if (admin) {
-        el.contentEditable = 'true';
-
-        // Enter key → new body-base paragraph
-        el.addEventListener('keydown', e => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            const para = getCurrentParagraph();
-            const currentStyle = para
-              ? (TYPE_CLASSES.find(c => para.classList.contains(c)) || 'body-base')
-              : 'body-base';
-            const newPara = document.createElement('div');
-            newPara.className = currentStyle;
-            newPara.innerHTML = '<br>';
-            if (para) para.after(newPara);
-            else el.appendChild(newPara);
-            // Move cursor
-            const range = document.createRange();
-            range.setStart(newPara, 0);
-            range.collapse(true);
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-          }
-        });
-
-        el.addEventListener('focus', () => showToolbar(el));
-        el.addEventListener('blur',  () => setTimeout(() => {
-          if (document.activeElement !== el && !toolbar?.contains(document.activeElement)) {
-            saveCurrentTextBlock();
-            hideToolbar();
-          }
-        }, 150));
-
-        el.addEventListener('keyup',       () => updateToolbarActive(getCurrentParagraphStyle()));
-        el.addEventListener('mouseup',     () => updateToolbarActive(getCurrentParagraphStyle()));
-        el.addEventListener('selectionchange', () => updateToolbarActive(getCurrentParagraphStyle()));
-      }
-
       wrap.appendChild(el);
+
+    } else if (block.type === 'group') {
+      wrap.appendChild(renderGroupChildren(block, admin));
 
     } else if (block.type === 'image') {
       wrap.classList.add('cb-block--image');
@@ -782,11 +745,17 @@ const ContentBuilder = (() => {
     sectionBtn.textContent = '+ Section Block';
     sectionBtn.addEventListener('click', () => addBlock({ type: 'section', sectionTitle: '' }));
 
+    const groupBtn = document.createElement('button');
+    groupBtn.className = 'btn--secondary';
+    groupBtn.textContent = '+ Group Block';
+    groupBtn.addEventListener('click', () => addBlock({ type: 'group', fill: '#FFFFFF', children: [{ id: uid(), type: 'text', content: '' }] }));
+
     bar.appendChild(textBtn);
     bar.appendChild(imgBtn);
     bar.appendChild(vidBtn);
     bar.appendChild(spacerBtn);
     bar.appendChild(sectionBtn);
+    bar.appendChild(groupBtn);
     return bar;
   }
 
@@ -823,7 +792,7 @@ const ContentBuilder = (() => {
 
   function setImageScale(blockId, imgIndex, scale) {
     const blocks = loadBlocks();
-    const b = blocks.find(b => b.id === blockId);
+    const b = findBlockInArray(blocks, blockId);
     if (b) {
       const images = normalizeImages(b);
       images[imgIndex].scale = scale;
@@ -836,7 +805,7 @@ const ContentBuilder = (() => {
 
   function removeImage(blockId, imgIndex) {
     const blocks = loadBlocks();
-    const b = blocks.find(b => b.id === blockId);
+    const b = findBlockInArray(blocks, blockId);
     if (b) {
       const images = normalizeImages(b);
       images.splice(imgIndex, 1);
@@ -849,7 +818,7 @@ const ContentBuilder = (() => {
 
   function addImageToBlock(blockId, src) {
     const blocks = loadBlocks();
-    const b = blocks.find(b => b.id === blockId);
+    const b = findBlockInArray(blocks, blockId);
     if (b) {
       const images = normalizeImages(b);
       images.push({ src, alt: '', scale: 100 });
@@ -862,21 +831,21 @@ const ContentBuilder = (() => {
 
   function setPadding(id, value) {
     const blocks = loadBlocks();
-    const b = blocks.find(b => b.id === id);
+    const b = findBlockInArray(blocks, id);
     if (b) { b.imagePadding = value; saveBlocks(blocks); }
     render();
   }
 
   function setAlignment(id, value) {
     const blocks = loadBlocks();
-    const b = blocks.find(b => b.id === id);
+    const b = findBlockInArray(blocks, id);
     if (b) { b.imageAlign = value; saveBlocks(blocks); }
     render();
   }
 
   function setImageFlow(id, value) {
     const blocks = loadBlocks();
-    const b = blocks.find(b => b.id === id);
+    const b = findBlockInArray(blocks, id);
     if (b) { b.imageFlow = value; saveBlocks(blocks); }
     render();
   }
@@ -900,8 +869,225 @@ const ContentBuilder = (() => {
 
   function setFill(id, fill) {
     const blocks = loadBlocks();
-    const b = blocks.find(b => b.id === id);
+    const b = findBlockInArray(blocks, id);
     if (b) { b.fill = fill; saveBlocks(blocks); }
+    render();
+  }
+
+  // ── Group block ───────────────────────────────────────────
+
+  function buildTextEl(block, admin) {
+    const el = document.createElement('div');
+    el.className = 'cb-text';
+    el.dataset.blockId = block.id;
+    if (block.content) {
+      el.innerHTML = block.content;
+    } else if (admin) {
+      const p = document.createElement('div');
+      p.className = 'body-base';
+      p.textContent = 'Click to edit…';
+      el.appendChild(p);
+    }
+    if (admin) {
+      el.contentEditable = 'true';
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const para = getCurrentParagraph();
+          const currentStyle = para
+            ? (TYPE_CLASSES.find(c => para.classList.contains(c)) || 'body-base')
+            : 'body-base';
+          const newPara = document.createElement('div');
+          newPara.className = currentStyle;
+          newPara.innerHTML = '<br>';
+          if (para) para.after(newPara);
+          else el.appendChild(newPara);
+          const range = document.createRange();
+          range.setStart(newPara, 0);
+          range.collapse(true);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      });
+      el.addEventListener('focus', () => showToolbar(el));
+      el.addEventListener('blur', () => setTimeout(() => {
+        if (document.activeElement !== el && !toolbar?.contains(document.activeElement)) {
+          saveCurrentTextBlock();
+          hideToolbar();
+        }
+      }, 150));
+      el.addEventListener('keyup',       () => updateToolbarActive(getCurrentParagraphStyle()));
+      el.addEventListener('mouseup',     () => updateToolbarActive(getCurrentParagraphStyle()));
+      el.addEventListener('selectionchange', () => updateToolbarActive(getCurrentParagraphStyle()));
+    }
+    return el;
+  }
+
+  function renderGroupChildren(group, admin) {
+    const container = document.createElement('div');
+    container.style.cssText = 'display:flex; flex-direction:column; gap:var(--space-4);';
+
+    const children = group.children || [];
+    const dark = isDarkFill(group.fill || '#FFFFFF');
+
+    children.forEach((child, i) => {
+      const childWrap = document.createElement('div');
+      if (i > 0) childWrap.style.cssText = 'border-top:1px solid ' + (dark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)') + '; padding-top:var(--space-4);';
+
+      const content = renderGroupChildContent(child, group, admin);
+      childWrap.appendChild(content);
+
+      if (admin) {
+        const controls = document.createElement('div');
+        controls.style.cssText = 'display:flex; gap:var(--space-2); margin-top:var(--space-2); flex-wrap:wrap;';
+
+        if (i > 0) controls.appendChild(makeArrowBtn(SVG_ARROW_UP, () => moveChildInGroup(group.id, child.id, -1)));
+        if (i < children.length - 1) controls.appendChild(makeArrowBtn(SVG_ARROW_DOWN, () => moveChildInGroup(group.id, child.id, 1)));
+
+        const del = makeBtn('✕ Remove', () => deleteChildFromGroup(group.id, child.id));
+        del.classList.add('cb-btn--delete');
+        controls.appendChild(del);
+        childWrap.appendChild(controls);
+      }
+
+      container.appendChild(childWrap);
+    });
+
+    if (admin) {
+      const addBar = document.createElement('div');
+      addBar.style.cssText = 'display:flex; gap:var(--space-2); flex-wrap:wrap; border-top:1px dashed #D4D4D4; padding-top:var(--space-3); margin-top:var(--space-2);';
+
+      const t = makeBtn('+ Text',  () => addChildToGroup(group.id, { type: 'text', content: '' }));
+      const m = makeBtn('+ Image', () => openImagePicker(null, group.id));
+      const v = makeBtn('+ Video', () => openVideoPicker(null, group.id));
+      addBar.appendChild(t);
+      addBar.appendChild(m);
+      addBar.appendChild(v);
+      container.appendChild(addBar);
+    }
+
+    return container;
+  }
+
+  function renderGroupChildContent(child, group, admin) {
+    const dark = isDarkFill(group.fill || '#FFFFFF');
+
+    if (child.type === 'text') {
+      const el = buildTextEl(child, admin);
+      el.style.color = dark ? '#FFFFFF' : '#000000';
+      return el;
+    }
+
+    if (child.type === 'image') {
+      const images = normalizeImages(child);
+      const imgWrap = document.createElement('div');
+      imgWrap.className = 'cb-image-wrap';
+      const pad = child.imagePadding;
+      if (pad && pad !== 'hug') imgWrap.style.padding = isNaN(pad) ? '32px' : pad + 'px';
+
+      images.forEach((imgData, imgIndex) => {
+        const imgRow = document.createElement('div');
+        imgRow.className = 'cb-image-row';
+        const img = document.createElement('img');
+        img.src = imgData.src;
+        img.alt = imgData.alt || '';
+        img.className = 'cb-image';
+        img.style.width = (imgData.scale || 100) + '%';
+        imgRow.appendChild(img);
+
+        if (admin) {
+          const imgControls = document.createElement('div');
+          imgControls.className = 'cb-image-controls';
+          const scaleLabel = document.createElement('span');
+          scaleLabel.className = 'label';
+          scaleLabel.style.cssText = 'color:inherit; margin-right:var(--space-2);';
+          scaleLabel.textContent = 'Scale:';
+          imgControls.appendChild(scaleLabel);
+          [25, 50, 75, 100].forEach(pct => {
+            const btn = document.createElement('button');
+            btn.className = 'btn--secondary cb-scale-btn';
+            btn.textContent = pct + '%';
+            if (pct === (imgData.scale || 100)) btn.classList.add('cb-scale-btn--active');
+            btn.addEventListener('click', () => setImageScale(child.id, imgIndex, pct));
+            imgControls.appendChild(btn);
+          });
+          if (images.length > 1) {
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'btn--secondary cb-btn--delete';
+            removeBtn.style.marginLeft = 'auto';
+            removeBtn.textContent = '✕';
+            removeBtn.addEventListener('click', () => removeImage(child.id, imgIndex));
+            imgControls.appendChild(removeBtn);
+          }
+          imgRow.appendChild(imgControls);
+        }
+        imgWrap.appendChild(imgRow);
+      });
+
+      return imgWrap;
+    }
+
+    if (child.type === 'video') {
+      const embedId = youtubeId(child.url || '');
+      const videoWrap = document.createElement('div');
+      videoWrap.className = 'cb-video-wrap';
+      if (embedId) {
+        const iframe = document.createElement('iframe');
+        iframe.src = 'https://www.youtube.com/embed/' + embedId;
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.allowFullscreen = true;
+        iframe.frameBorder = '0';
+        videoWrap.appendChild(iframe);
+      } else {
+        const placeholder = document.createElement('p');
+        placeholder.className = 'caption';
+        placeholder.style.cssText = 'padding:var(--space-4); text-align:center;';
+        placeholder.textContent = admin ? 'No video URL set — click "Change URL" to add one.' : '';
+        videoWrap.appendChild(placeholder);
+      }
+      if (admin) {
+        const urlBtn = document.createElement('button');
+        urlBtn.className = 'btn--secondary';
+        urlBtn.style.marginTop = 'var(--space-3)';
+        urlBtn.textContent = 'Change URL';
+        urlBtn.addEventListener('click', () => openVideoPicker(child.id));
+        videoWrap.appendChild(urlBtn);
+      }
+      return videoWrap;
+    }
+
+    return document.createElement('div');
+  }
+
+  function addChildToGroup(groupId, data) {
+    const blocks = loadBlocks();
+    const group = blocks.find(b => b.id === groupId);
+    if (!group) return;
+    if (!group.children) group.children = [];
+    group.children.push({ id: uid(), ...data });
+    saveBlocks(blocks);
+    render();
+  }
+
+  function deleteChildFromGroup(groupId, childId) {
+    const blocks = loadBlocks();
+    const group = blocks.find(b => b.id === groupId);
+    if (!group || !group.children) return;
+    group.children = group.children.filter(c => c.id !== childId);
+    saveBlocks(blocks);
+    render();
+  }
+
+  function moveChildInGroup(groupId, childId, dir) {
+    const blocks = loadBlocks();
+    const group = blocks.find(b => b.id === groupId);
+    if (!group || !group.children) return;
+    const i = group.children.findIndex(c => c.id === childId);
+    const j = i + dir;
+    if (j < 0 || j >= group.children.length) return;
+    [group.children[i], group.children[j]] = [group.children[j], group.children[i]];
+    saveBlocks(blocks);
     render();
   }
 
@@ -913,7 +1099,7 @@ const ContentBuilder = (() => {
     return null;
   }
 
-  function openImagePicker(blockId = null) {
+  function openImagePicker(blockId = null, groupId = null) {
     const modal = document.createElement('div');
     modal.className = 'cb-modal';
 
@@ -944,6 +1130,8 @@ const ContentBuilder = (() => {
       const src = driveDirectUrl(raw) || raw;
       if (blockId) {
         addImageToBlock(blockId, src);
+      } else if (groupId) {
+        addChildToGroup(groupId, { type: 'image', images: [{ src, alt: '', scale: 100 }] });
       } else {
         addBlock({ type: 'image', images: [{ src, alt: '', scale: 100 }], fill: '#FFFFFF' });
       }
@@ -995,6 +1183,8 @@ const ContentBuilder = (() => {
         thumbEl.addEventListener('click', () => {
           if (blockId) {
             addImageToBlock(blockId, src);
+          } else if (groupId) {
+            addChildToGroup(groupId, { type: 'image', images: [{ src, alt: '', scale: 100 }] });
           } else {
             addBlock({ type: 'image', images: [{ src, alt: '', scale: 100 }], fill: '#FFFFFF' });
           }
@@ -1048,7 +1238,7 @@ const ContentBuilder = (() => {
     return null;
   }
 
-  function openVideoPicker(blockId = null) {
+  function openVideoPicker(blockId = null, groupId = null) {
     const modal = document.createElement('div');
     modal.className = 'cb-modal';
 
@@ -1096,8 +1286,10 @@ const ContentBuilder = (() => {
       if (!youtubeId(url)) return;
       if (blockId) {
         const blocks = loadBlocks();
-        const b = blocks.find(b => b.id === blockId);
+        const b = findBlockInArray(blocks, blockId);
         if (b) { b.url = url; saveBlocks(blocks); }
+      } else if (groupId) {
+        addChildToGroup(groupId, { type: 'video', url });
       } else {
         addBlock({ type: 'video', url, fill: '#FFFFFF' });
       }
