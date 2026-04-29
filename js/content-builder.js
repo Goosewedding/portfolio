@@ -1791,97 +1791,103 @@ const ContentBuilder = (() => {
     const h1 = document.querySelector('h1.heading-xl');
     if (!h1) return;
 
-    // Only show on known project pages, not on portfolio/index
     const filename = window.location.pathname.split('/').pop();
-    if (typeof Folders !== 'undefined' && !Folders.getProjectFolder(filename)) return;
-
-    const key = visibilityKey();
-
-    function isHidden() {
-      return localStorage.getItem(key) === 'true';
-    }
+    const isProjectPage = typeof Folders !== 'undefined' && !!Folders.getProjectFolder(filename);
 
     const row = document.createElement('div');
     row.style.cssText = 'display:flex; align-items:center; gap:var(--space-3); margin-top:var(--space-3); flex-wrap:wrap;';
 
-    const btn = document.createElement('button');
-    btn.className = 'btn--secondary';
-    btn.textContent = isHidden() ? 'Hidden from visitors' : 'Visible to visitors';
+    // Visibility, rank, and folder controls only on known project pages
+    if (isProjectPage) {
+      const key = visibilityKey();
 
-    btn.addEventListener('click', () => {
-      const nowHidden = !isHidden();
-      if (nowHidden) {
-        localStorage.setItem(key, 'true');
-      } else {
-        localStorage.removeItem(key);
+      function isHidden() {
+        return localStorage.getItem(key) === 'true';
       }
-      btn.textContent = nowHidden ? 'Hidden from visitors' : 'Visible to visitors';
-    });
 
-    // ── Rank field ─────────────────────────────────────────
-    const rankKey = 'rank_' + filename.replace('.html', '');
-    const rankWrap = document.createElement('div');
-    rankWrap.style.cssText = 'display:flex; align-items:center; gap:6px;';
+      const btn = document.createElement('button');
+      btn.className = 'btn--secondary';
+      btn.textContent = isHidden() ? 'Hidden from visitors' : 'Visible to visitors';
 
-    const rankLabel = document.createElement('label');
-    rankLabel.className = 'caption';
-    rankLabel.textContent = 'Order:';
+      btn.addEventListener('click', () => {
+        const nowHidden = !isHidden();
+        if (nowHidden) {
+          localStorage.setItem(key, 'true');
+        } else {
+          localStorage.removeItem(key);
+        }
+        btn.textContent = nowHidden ? 'Hidden from visitors' : 'Visible to visitors';
+      });
 
-    const rankInput = document.createElement('input');
-    rankInput.type = 'number';
-    rankInput.min = '1';
-    rankInput.placeholder = '—';
-    rankInput.style.cssText = 'width:52px; padding:4px 6px; border:1px solid #000; font-family:inherit; font-size:13px; text-align:center;';
-    const savedRank = localStorage.getItem(rankKey);
-    if (savedRank) rankInput.value = savedRank;
+      // ── Rank field ───────────────────────────────────────
+      const rankKey = 'rank_' + filename.replace('.html', '');
+      const rankWrap = document.createElement('div');
+      rankWrap.style.cssText = 'display:flex; align-items:center; gap:6px;';
 
-    rankInput.addEventListener('change', () => {
-      const val = rankInput.value.trim();
-      if (val) {
-        localStorage.setItem(rankKey, val);
-      } else {
-        localStorage.removeItem(rankKey);
-      }
-    });
+      const rankLabel = document.createElement('label');
+      rankLabel.className = 'caption';
+      rankLabel.textContent = 'Order:';
 
-    rankWrap.appendChild(rankLabel);
-    rankWrap.appendChild(rankInput);
+      const rankInput = document.createElement('input');
+      rankInput.type = 'number';
+      rankInput.min = '1';
+      rankInput.placeholder = '—';
+      rankInput.style.cssText = 'width:52px; padding:4px 6px; border:1px solid #000; font-family:inherit; font-size:13px; text-align:center;';
+      const savedRank = localStorage.getItem(rankKey);
+      if (savedRank) rankInput.value = savedRank;
 
-    // ── Folder selector ────────────────────────────────────
-    const folderKey = 'folder_' + filename.replace('.html', '');
-    const folderWrap = document.createElement('div');
-    folderWrap.style.cssText = 'display:flex; align-items:center; gap:6px;';
+      rankInput.addEventListener('change', () => {
+        const val = rankInput.value.trim();
+        if (val) {
+          localStorage.setItem(rankKey, val);
+        } else {
+          localStorage.removeItem(rankKey);
+        }
+      });
 
-    const folderLabel = document.createElement('label');
-    folderLabel.className = 'caption';
-    folderLabel.textContent = 'Folder:';
+      rankWrap.appendChild(rankLabel);
+      rankWrap.appendChild(rankInput);
 
-    const folderSelect = document.createElement('select');
-    folderSelect.style.cssText = 'padding:4px 6px; border:1px solid #000; font-family:inherit; font-size:13px; background:#fff;';
+      // ── Folder selector ──────────────────────────────────
+      const folderKey = 'folder_' + filename.replace('.html', '');
+      const folderWrap = document.createElement('div');
+      folderWrap.style.cssText = 'display:flex; align-items:center; gap:6px;';
 
-    const labels = (typeof Folders !== 'undefined') ? Folders.getLabels() : [];
-    const defaultFolder = (typeof Folders !== 'undefined') ? Folders.getProjectFolder(filename) : null;
-    const savedFolder = localStorage.getItem(folderKey) || defaultFolder;
+      const folderLabel = document.createElement('label');
+      folderLabel.className = 'caption';
+      folderLabel.textContent = 'Folder:';
 
-    labels.forEach(label => {
-      const opt = document.createElement('option');
-      opt.value = label;
-      opt.textContent = (typeof Folders !== 'undefined') ? Folders.getDisplayName(label) : label;
-      if (label === savedFolder) opt.selected = true;
-      folderSelect.appendChild(opt);
-    });
+      const folderSelect = document.createElement('select');
+      folderSelect.style.cssText = 'padding:4px 6px; border:1px solid #000; font-family:inherit; font-size:13px; background:#fff;';
 
-    folderSelect.addEventListener('change', () => {
-      const val = folderSelect.value;
-      if (val === defaultFolder) {
-        localStorage.removeItem(folderKey);
-      } else {
-        localStorage.setItem(folderKey, val);
-      }
-    });
+      const labels = (typeof Folders !== 'undefined') ? Folders.getLabels() : [];
+      const defaultFolder = (typeof Folders !== 'undefined') ? Folders.getProjectFolder(filename) : null;
+      const savedFolder = localStorage.getItem(folderKey) || defaultFolder;
 
-    folderWrap.appendChild(folderLabel);
-    folderWrap.appendChild(folderSelect);
+      labels.forEach(label => {
+        const opt = document.createElement('option');
+        opt.value = label;
+        opt.textContent = (typeof Folders !== 'undefined') ? Folders.getDisplayName(label) : label;
+        if (label === savedFolder) opt.selected = true;
+        folderSelect.appendChild(opt);
+      });
+
+      folderSelect.addEventListener('change', () => {
+        const val = folderSelect.value;
+        if (val === defaultFolder) {
+          localStorage.removeItem(folderKey);
+        } else {
+          localStorage.setItem(folderKey, val);
+        }
+      });
+
+      folderWrap.appendChild(folderLabel);
+      folderWrap.appendChild(folderSelect);
+
+      row.appendChild(btn);
+      row.appendChild(rankWrap);
+      row.appendChild(folderWrap);
+    }
 
     // ── Gear button + settings panel ──────────────────────────
     const SVG_GEAR = `<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 0H8V2H10V4H12V8H10V10H8V12H4V10H2V8H0V4H2V2H4V0ZM4 4H8V8H4V4Z"/></svg>`;
@@ -2063,9 +2069,6 @@ const ContentBuilder = (() => {
       }
     });
 
-    row.appendChild(btn);
-    row.appendChild(rankWrap);
-    row.appendChild(folderWrap);
     row.appendChild(gearBtn);
     titleCard.appendChild(row);
     titleCard.appendChild(panel);
