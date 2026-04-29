@@ -211,6 +211,23 @@ const ContentBuilder = (() => {
     { label: 'Arrow Down',  src: 'icons/arrow down.svg'       },
     { label: 'Arrow Left',  src: 'icons/arrow left.svg'       },
     { label: 'Arrow Right', src: 'icons/arrow right.svg'      },
+    { label: '-8',          src: 'icons/-8.svg'               },
+    { label: '-32',         src: 'icons/-32.svg'              },
+    { label: '-33',         src: 'icons/-33.svg'              },
+    { label: '-37',         src: 'icons/-37.svg'              },
+    { label: '-39',         src: 'icons/-39.svg'              },
+    { label: '-50',         src: 'icons/-50.svg'              },
+    { label: '-51',         src: 'icons/-51.svg'              },
+    { label: '-58',         src: 'icons/-58.svg'              },
+    { label: 'Beasts 19',   src: 'icons/Beasts19.svg'         },
+    { label: 'Comm 29',     src: 'icons/Communication29.svg'  },
+    { label: 'Comm 32',     src: 'icons/Communication32.svg'  },
+    { label: 'Nature 50',   src: 'icons/Nature50.svg'         },
+    { label: 'Nature 51',   src: 'icons/Nature51.svg'         },
+    { label: 'People 36',   src: 'icons/People36.svg'         },
+    { label: 'Treasure 5',  src: 'icons/Treasures5.svg'       },
+    { label: 'Treasure 20', src: 'icons/Treasures20.svg'      },
+    { label: 'Misc 2',      src: 'icons/_Ends__Odds2.svg'     },
   ];
 
   const SVG_ARROW_UP   = `<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.58824 0.79469V1.19204H6.17647H5.76471V1.58939V1.98674H5.35294H4.94118V2.38409V2.78144H4.52941H4.11765V3.1788V3.57615H3.70588H3.29412V3.9735V4.37085H2.88235H2.47059V4.7682V5.16555H2.05882H1.64706V5.5629V5.96025H1.23529H0.823529V6.3576V6.75495H0.411765H0V7.15231V7.54966H2.05882H4.11765V9.77482V12H7H9.88235V9.77617V7.55236L11.9618 7.53114L14.0412 7.50992L14.0655 7.11257L14.0898 6.71522L13.6331 6.74248L13.1765 6.76966V6.36499V5.96025H12.7647H12.3529V5.5629V5.16555H11.9412H11.5294V4.7682V4.37085H11.1176H10.7059V3.9735V3.57615H10.2941H9.88235V3.1788V2.78144H9.47059H9.05882V2.38409V1.98674H8.64706H8.23529V1.58939V1.19204H7.82353H7.41176V0.79469V0.397339H7H6.58824V0.79469ZM0.0247059 7.15231C0.0247059 7.3927 0.0401059 7.49109 0.0589647 7.37085C0.0778235 7.25061 0.0778235 7.054 0.0589647 6.93376C0.0401059 6.81352 0.0247059 6.91191 0.0247059 7.15231Z" fill="currentColor"/></svg>`;
