@@ -290,8 +290,9 @@ const ContentBuilder = (() => {
     }
 
     const fill = block.fill || '#FFFFFF';
-    const dark = isDarkFill(fill);
-    wrap.style.backgroundColor = fill;
+    const isClear = block.fillOpacity === 'clear';
+    const dark = isClear ? false : isDarkFill(fill);
+    wrap.style.backgroundColor = isClear ? 'transparent' : fill;
     wrap.style.color = dark ? '#FFFFFF' : '#000000';
 
     if (admin) wrap.appendChild(renderControls(block.id, index, total, fill, block, nextBlock));
@@ -402,6 +403,7 @@ const ContentBuilder = (() => {
       const embedId = youtubeId(block.url || '');
       const videoWrap = document.createElement('div');
       videoWrap.className = 'cb-video-wrap';
+      applyVideoAspect(videoWrap, block);
 
       if (embedId) {
         const iframe = document.createElement('iframe');
@@ -525,7 +527,46 @@ const ContentBuilder = (() => {
       swatchLabel.textContent = 'Fill';
       fillSection.appendChild(swatchLabel);
       fillSection.appendChild(makeSwatchRow(currentFill, val => setFill(id, val)));
+
+      if (['text', 'image', 'video', 'group'].includes(block.type)) {
+        const opacityRow = document.createElement('div');
+        opacityRow.style.cssText = 'display:flex; gap:var(--space-2); margin-top:var(--space-2);';
+        ['Opaque', 'Clear'].forEach(label => {
+          const btn = document.createElement('button');
+          btn.className = 'btn--secondary cb-scale-btn';
+          btn.textContent = label;
+          const val = label.toLowerCase();
+          if ((block.fillOpacity || 'opaque') === val) btn.classList.add('cb-scale-btn--active');
+          btn.addEventListener('click', () => setFillOpacity(id, val));
+          opacityRow.appendChild(btn);
+        });
+        fillSection.appendChild(opacityRow);
+      }
+
       panel.appendChild(fillSection);
+
+      // Video aspect ratio
+      if (block.type === 'video') {
+        const aspectSection = document.createElement('div');
+        const aspectLabel = document.createElement('p');
+        aspectLabel.className = 'label';
+        aspectLabel.style.cssText = 'margin-bottom:var(--space-2); color:inherit;';
+        aspectLabel.textContent = 'Aspect Ratio';
+        aspectSection.appendChild(aspectLabel);
+
+        const aspectRow = document.createElement('div');
+        aspectRow.style.cssText = 'display:flex; gap:var(--space-2);';
+        [{ label: '16:9 Landscape', value: '16:9' }, { label: '9:16 Shorts', value: '9:16' }, { label: '1:1 Square', value: '1:1' }].forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'btn--secondary cb-scale-btn';
+          btn.textContent = opt.label;
+          if ((block.videoAspect || '16:9') === opt.value) btn.classList.add('cb-scale-btn--active');
+          btn.addEventListener('click', () => setVideoAspect(id, opt.value));
+          aspectRow.appendChild(btn);
+        });
+        aspectSection.appendChild(aspectRow);
+        panel.appendChild(aspectSection);
+      }
 
       // Image-only controls
       if (block.type === 'image') {
@@ -945,6 +986,30 @@ const ContentBuilder = (() => {
     render();
   }
 
+  function setFillOpacity(id, val) {
+    const blocks = loadBlocks();
+    const b = findBlockInArray(blocks, id);
+    if (b) { b.fillOpacity = val; saveBlocks(blocks); }
+    render();
+  }
+
+  function setVideoAspect(id, val) {
+    const blocks = loadBlocks();
+    const b = findBlockInArray(blocks, id);
+    if (b) { b.videoAspect = val; saveBlocks(blocks); }
+    render();
+  }
+
+  function applyVideoAspect(videoWrap, block) {
+    const aspect = block.videoAspect || '16:9';
+    if (aspect === '9:16') {
+      videoWrap.style.paddingBottom = '177.78%';
+      videoWrap.style.maxWidth = '360px';
+    } else if (aspect === '1:1') {
+      videoWrap.style.paddingBottom = '100%';
+    }
+  }
+
   // ── Group block ───────────────────────────────────────────
 
   function buildTextEl(block, admin) {
@@ -1105,6 +1170,7 @@ const ContentBuilder = (() => {
       const embedId = youtubeId(child.url || '');
       const videoWrap = document.createElement('div');
       videoWrap.className = 'cb-video-wrap';
+      applyVideoAspect(videoWrap, child);
       if (embedId) {
         const iframe = document.createElement('iframe');
         iframe.src = 'https://www.youtube.com/embed/' + embedId;
