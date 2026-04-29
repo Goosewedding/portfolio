@@ -98,7 +98,12 @@ const ContentBuilder = (() => {
 
   function isDarkFill(hex) {
     const c = COLORS.find(c => c.value === hex);
-    return c ? c.dark : false;
+    if (c) return c.dark;
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return false;
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    return (0.299 * r + 0.587 * g + 0.114 * b) < 0.5;
   }
 
   // ── Floating toolbar ──────────────────────────────────────
@@ -210,6 +215,8 @@ const ContentBuilder = (() => {
 
   const SVG_ARROW_UP   = `<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.58824 0.79469V1.19204H6.17647H5.76471V1.58939V1.98674H5.35294H4.94118V2.38409V2.78144H4.52941H4.11765V3.1788V3.57615H3.70588H3.29412V3.9735V4.37085H2.88235H2.47059V4.7682V5.16555H2.05882H1.64706V5.5629V5.96025H1.23529H0.823529V6.3576V6.75495H0.411765H0V7.15231V7.54966H2.05882H4.11765V9.77482V12H7H9.88235V9.77617V7.55236L11.9618 7.53114L14.0412 7.50992L14.0655 7.11257L14.0898 6.71522L13.6331 6.74248L13.1765 6.76966V6.36499V5.96025H12.7647H12.3529V5.5629V5.16555H11.9412H11.5294V4.7682V4.37085H11.1176H10.7059V3.9735V3.57615H10.2941H9.88235V3.1788V2.78144H9.47059H9.05882V2.38409V1.98674H8.64706H8.23529V1.58939V1.19204H7.82353H7.41176V0.79469V0.397339H7H6.58824V0.79469ZM0.0247059 7.15231C0.0247059 7.3927 0.0401059 7.49109 0.0589647 7.37085C0.0778235 7.25061 0.0778235 7.054 0.0589647 6.93376C0.0401059 6.81352 0.0247059 6.91191 0.0247059 7.15231Z" fill="currentColor"/></svg>`;
   const SVG_ARROW_DOWN = `<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.11765 2.78144V5.16555H2.05882H0V5.5629V5.96025H0.411765H0.823529V6.3576V6.75495H1.23529H1.64706V7.15231V7.54966H2.05882H2.47059V7.94701V8.34436H2.88235H3.29412V8.74171V9.13906H3.70588H4.11765V9.53641V9.93376H4.52941H4.94118V10.3311V10.7285H5.35294H5.76471V11.1258V11.5232H6.17647C6.57909 11.5232 6.58824 11.5285 6.58824 11.7616C6.58824 11.9947 6.59738 12 7 12C7.40262 12 7.41176 11.9947 7.41176 11.7616C7.41176 11.5285 7.42091 11.5232 7.82353 11.5232H8.23529V11.1258V10.7285H8.64706H9.05882V10.3311V9.93376H9.47059H9.88235V9.53641V9.13906H10.2941H10.7059V8.74171V8.34436H11.1176H11.5294V7.94701V7.54966H11.9412H12.3529V7.15231V6.75495H12.7647H13.1765V6.36174V5.9686L13.6088 5.94452L14.0412 5.92052L14.0654 5.52317L14.0897 5.12582L11.986 5.14831L9.88235 5.1708V2.78407V0.397339H7H4.11765V2.78144ZM0.0247059 5.5629C0.0247059 5.8033 0.0401059 5.90168 0.0589647 5.78144C0.0778235 5.66121 0.0778235 5.4646 0.0589647 5.34436C0.0401059 5.22412 0.0247059 5.3225 0.0247059 5.5629Z" fill="currentColor"/></svg>`;
+  const SVG_SKIP_TOP    = `<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="14" height="2" fill="currentColor"/><path d="M0 10H4V12H10V10H14L7 4L0 10Z" fill="currentColor"/></svg>`;
+  const SVG_SKIP_BOTTOM = `<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="10" width="14" height="2" fill="currentColor"/><path d="M14 2H10V0H4V2H0L7 8L14 2Z" fill="currentColor"/></svg>`;
 
   const openSettings = new Set();
 
@@ -404,6 +411,35 @@ const ContentBuilder = (() => {
       }
 
       wrap.appendChild(videoWrap);
+    } else if (block.type === 'soundcloud') {
+      const scWrap = document.createElement('div');
+      scWrap.className = 'cb-soundcloud-wrap';
+      const embedUrl = soundcloudEmbedUrl(block.url || '');
+
+      if (embedUrl) {
+        const iframe = document.createElement('iframe');
+        iframe.src = embedUrl;
+        iframe.allow = 'autoplay';
+        iframe.frameBorder = '0';
+        scWrap.appendChild(iframe);
+      } else {
+        const placeholder = document.createElement('p');
+        placeholder.className = 'caption';
+        placeholder.style.cssText = 'padding:var(--space-4); text-align:center;';
+        placeholder.textContent = admin ? 'No SoundCloud URL set — click "Change URL" to add one.' : '';
+        scWrap.appendChild(placeholder);
+      }
+
+      if (admin) {
+        const urlBtn = document.createElement('button');
+        urlBtn.className = 'btn--secondary';
+        urlBtn.style.marginTop = 'var(--space-3)';
+        urlBtn.textContent = 'Change URL';
+        urlBtn.addEventListener('click', () => openSoundCloudPicker(block.id));
+        scWrap.appendChild(urlBtn);
+      }
+
+      wrap.appendChild(scWrap);
     }
 
     return wrap;
@@ -416,8 +452,10 @@ const ContentBuilder = (() => {
     const actions = document.createElement('div');
     actions.className = 'cb-actions';
 
-    if (index > 0)         actions.appendChild(makeArrowBtn(SVG_ARROW_UP,   () => moveBlock(id, -1)));
-    if (index < total - 1) actions.appendChild(makeArrowBtn(SVG_ARROW_DOWN, () => moveBlock(id,  1)));
+    if (index > 0)         actions.appendChild(makeArrowBtn(SVG_SKIP_TOP,    () => moveBlockToTop(id)));
+    if (index > 0)         actions.appendChild(makeArrowBtn(SVG_ARROW_UP,    () => moveBlock(id, -1)));
+    if (index < total - 1) actions.appendChild(makeArrowBtn(SVG_ARROW_DOWN,  () => moveBlock(id,  1)));
+    if (index < total - 1) actions.appendChild(makeArrowBtn(SVG_SKIP_BOTTOM, () => moveBlockToBottom(id)));
 
     const hugTopBtn = document.createElement('button');
     hugTopBtn.className = 'btn--secondary cb-scale-btn';
@@ -469,19 +507,7 @@ const ContentBuilder = (() => {
       swatchLabel.style.cssText = 'margin-bottom:var(--space-2); color:inherit;';
       swatchLabel.textContent = 'Fill';
       fillSection.appendChild(swatchLabel);
-
-      const swatches = document.createElement('div');
-      swatches.className = 'cb-swatches';
-      COLORS.forEach(color => {
-        const btn = document.createElement('button');
-        btn.className = 'cb-swatch';
-        btn.style.backgroundColor = color.value;
-        btn.title = color.label;
-        if (color.value === currentFill) btn.classList.add('cb-swatch--active');
-        btn.addEventListener('click', () => setFill(id, color.value));
-        swatches.appendChild(btn);
-      });
-      fillSection.appendChild(swatches);
+      fillSection.appendChild(makeSwatchRow(currentFill, val => setFill(id, val)));
       panel.appendChild(fillSection);
 
       // Image-only controls
@@ -582,8 +608,10 @@ const ContentBuilder = (() => {
     const actions = document.createElement('div');
     actions.className = 'cb-actions';
 
-    if (index > 0)         actions.appendChild(makeArrowBtn(SVG_ARROW_UP,   () => moveBlock(id, -1)));
-    if (index < total - 1) actions.appendChild(makeArrowBtn(SVG_ARROW_DOWN, () => moveBlock(id,  1)));
+    if (index > 0)         actions.appendChild(makeArrowBtn(SVG_SKIP_TOP,    () => moveBlockToTop(id)));
+    if (index > 0)         actions.appendChild(makeArrowBtn(SVG_ARROW_UP,    () => moveBlock(id, -1)));
+    if (index < total - 1) actions.appendChild(makeArrowBtn(SVG_ARROW_DOWN,  () => moveBlock(id,  1)));
+    if (index < total - 1) actions.appendChild(makeArrowBtn(SVG_SKIP_BOTTOM, () => moveBlockToBottom(id)));
 
     const hugTopBtn = document.createElement('button');
     hugTopBtn.className = 'btn--secondary cb-scale-btn';
@@ -653,8 +681,10 @@ const ContentBuilder = (() => {
     const rightGroup = document.createElement('div');
     rightGroup.style.cssText = 'display:flex; align-items:center; gap:var(--space-2); margin-left:auto;';
 
-    if (index > 0)         rightGroup.appendChild(makeArrowBtn(SVG_ARROW_UP,   () => moveBlock(id, -1)));
-    if (index < total - 1) rightGroup.appendChild(makeArrowBtn(SVG_ARROW_DOWN, () => moveBlock(id,  1)));
+    if (index > 0)         rightGroup.appendChild(makeArrowBtn(SVG_SKIP_TOP,    () => moveBlockToTop(id)));
+    if (index > 0)         rightGroup.appendChild(makeArrowBtn(SVG_ARROW_UP,    () => moveBlock(id, -1)));
+    if (index < total - 1) rightGroup.appendChild(makeArrowBtn(SVG_ARROW_DOWN,  () => moveBlock(id,  1)));
+    if (index < total - 1) rightGroup.appendChild(makeArrowBtn(SVG_SKIP_BOTTOM, () => moveBlockToBottom(id)));
 
     const del = makeBtn('✕ Remove', () => deleteBlock(id));
     del.classList.add('cb-btn--delete');
@@ -735,6 +765,11 @@ const ContentBuilder = (() => {
     vidBtn.textContent = '+ Video Block';
     vidBtn.addEventListener('click', () => openVideoPicker());
 
+    const scBtn = document.createElement('button');
+    scBtn.className = 'btn--secondary';
+    scBtn.textContent = '+ SoundCloud Block';
+    scBtn.addEventListener('click', () => openSoundCloudPicker());
+
     const spacerBtn = document.createElement('button');
     spacerBtn.className = 'btn--secondary';
     spacerBtn.textContent = '+ Padding Block';
@@ -753,6 +788,7 @@ const ContentBuilder = (() => {
     bar.appendChild(textBtn);
     bar.appendChild(imgBtn);
     bar.appendChild(vidBtn);
+    bar.appendChild(scBtn);
     bar.appendChild(spacerBtn);
     bar.appendChild(sectionBtn);
     bar.appendChild(groupBtn);
@@ -779,6 +815,24 @@ const ContentBuilder = (() => {
     const j = i + dir;
     if (j < 0 || j >= blocks.length) return;
     [blocks[i], blocks[j]] = [blocks[j], blocks[i]];
+    saveBlocks(blocks);
+    render();
+  }
+
+  function moveBlockToTop(id) {
+    const blocks = loadBlocks();
+    const i = blocks.findIndex(b => b.id === id);
+    if (i <= 0) return;
+    blocks.unshift(blocks.splice(i, 1)[0]);
+    saveBlocks(blocks);
+    render();
+  }
+
+  function moveBlockToBottom(id) {
+    const blocks = loadBlocks();
+    const i = blocks.findIndex(b => b.id === id);
+    if (i < 0 || i === blocks.length - 1) return;
+    blocks.push(blocks.splice(i, 1)[0]);
     saveBlocks(blocks);
     render();
   }
@@ -958,12 +1012,14 @@ const ContentBuilder = (() => {
       const addBar = document.createElement('div');
       addBar.style.cssText = 'display:flex; gap:var(--space-2); flex-wrap:wrap; border-top:1px dashed #D4D4D4; padding-top:var(--space-3); margin-top:var(--space-2);';
 
-      const t = makeBtn('+ Text',  () => addChildToGroup(group.id, { type: 'text', content: '' }));
-      const m = makeBtn('+ Image', () => openImagePicker(null, group.id));
-      const v = makeBtn('+ Video', () => openVideoPicker(null, group.id));
+      const t = makeBtn('+ Text',       () => addChildToGroup(group.id, { type: 'text', content: '' }));
+      const m = makeBtn('+ Image',      () => openImagePicker(null, group.id));
+      const v = makeBtn('+ Video',      () => openVideoPicker(null, group.id));
+      const s = makeBtn('+ SoundCloud', () => openSoundCloudPicker(null, group.id));
       addBar.appendChild(t);
       addBar.appendChild(m);
       addBar.appendChild(v);
+      addBar.appendChild(s);
       container.appendChild(addBar);
     }
 
@@ -1055,6 +1111,36 @@ const ContentBuilder = (() => {
         videoWrap.appendChild(urlBtn);
       }
       return videoWrap;
+    }
+
+    if (child.type === 'soundcloud') {
+      const scWrap = document.createElement('div');
+      scWrap.className = 'cb-soundcloud-wrap';
+      const embedUrl = soundcloudEmbedUrl(child.url || '');
+
+      if (embedUrl) {
+        const iframe = document.createElement('iframe');
+        iframe.src = embedUrl;
+        iframe.allow = 'autoplay';
+        iframe.frameBorder = '0';
+        scWrap.appendChild(iframe);
+      } else {
+        const placeholder = document.createElement('p');
+        placeholder.className = 'caption';
+        placeholder.style.cssText = 'padding:var(--space-4); text-align:center;';
+        placeholder.textContent = admin ? 'No SoundCloud URL set — click "Change URL" to add one.' : '';
+        scWrap.appendChild(placeholder);
+      }
+
+      if (admin) {
+        const urlBtn = document.createElement('button');
+        urlBtn.className = 'btn--secondary';
+        urlBtn.style.marginTop = 'var(--space-3)';
+        urlBtn.textContent = 'Change URL';
+        urlBtn.addEventListener('click', () => openSoundCloudPicker(child.id));
+        scWrap.appendChild(urlBtn);
+      }
+      return scWrap;
     }
 
     return document.createElement('div');
@@ -1292,6 +1378,90 @@ const ContentBuilder = (() => {
         addChildToGroup(groupId, { type: 'video', url });
       } else {
         addBlock({ type: 'video', url, fill: '#FFFFFF' });
+      }
+      document.body.removeChild(modal);
+      render();
+    });
+
+    const cancel = document.createElement('button');
+    cancel.className = 'btn--text';
+    cancel.textContent = 'Cancel';
+    cancel.addEventListener('click', () => document.body.removeChild(modal));
+
+    btnRow.appendChild(confirm);
+    btnRow.appendChild(cancel);
+    inner.appendChild(btnRow);
+
+    modal.appendChild(inner);
+    modal.addEventListener('click', e => {
+      if (e.target === modal) document.body.removeChild(modal);
+    });
+
+    document.body.appendChild(modal);
+    input.focus();
+  }
+
+  // ── SoundCloud picker ─────────────────────────────────────
+
+  function soundcloudEmbedUrl(url) {
+    if (!url || !url.includes('soundcloud.com')) return null;
+    return 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) +
+      '&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false';
+  }
+
+  function openSoundCloudPicker(blockId = null, groupId = null) {
+    const modal = document.createElement('div');
+    modal.className = 'cb-modal';
+
+    const inner = document.createElement('div');
+    inner.className = 'cb-modal-inner';
+
+    const heading = document.createElement('p');
+    heading.className = 'label';
+    heading.style.marginBottom = 'var(--space-4)';
+    heading.textContent = 'SoundCloud URL';
+    inner.appendChild(heading);
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'https://soundcloud.com/artist/track';
+    input.style.cssText = 'width:100%; padding:8px; font-size:14px; border:1px solid #000; box-sizing:border-box;';
+    inner.appendChild(input);
+
+    const preview = document.createElement('div');
+    preview.className = 'cb-soundcloud-wrap';
+    preview.style.marginTop = 'var(--space-4)';
+    inner.appendChild(preview);
+
+    input.addEventListener('input', () => {
+      const embedUrl = soundcloudEmbedUrl(input.value.trim());
+      preview.innerHTML = '';
+      if (embedUrl) {
+        const iframe = document.createElement('iframe');
+        iframe.src = embedUrl;
+        iframe.allow = 'autoplay';
+        iframe.frameBorder = '0';
+        preview.appendChild(iframe);
+      }
+    });
+
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex; gap:var(--space-3); margin-top:var(--space-6);';
+
+    const confirm = document.createElement('button');
+    confirm.className = 'btn--primary';
+    confirm.textContent = 'Embed';
+    confirm.addEventListener('click', () => {
+      const url = input.value.trim();
+      if (!soundcloudEmbedUrl(url)) return;
+      if (blockId) {
+        const blocks = loadBlocks();
+        const b = findBlockInArray(blocks, blockId);
+        if (b) { b.url = url; saveBlocks(blocks); }
+      } else if (groupId) {
+        addChildToGroup(groupId, { type: 'soundcloud', url });
+      } else {
+        addBlock({ type: 'soundcloud', url, fill: '#FFFFFF' });
       }
       document.body.removeChild(modal);
       render();
