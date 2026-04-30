@@ -8,7 +8,7 @@
   <style>
     body {
       background-color: #000000;
-      background-image: url('images/ditha.gif');
+      background-image: var(--bg-url);
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -31,6 +31,20 @@
     if (!localStorage.getItem('startup_played')) {
       document.documentElement.classList.add('first-launch');
     }
+    (function() {
+      var bgs = [
+        'backgrounds/background.gif',
+        'backgrounds/background 2.gif',
+        'backgrounds/background 3.gif',
+        'backgrounds/background 4.gif',
+        'backgrounds/background 5.gif',
+        'backgrounds/background 6.gif',
+        'backgrounds/BACKGROUND 7.gif',
+        'backgrounds/ditha.gif'
+      ];
+      var pick = bgs[Math.floor(Math.random() * bgs.length)];
+      document.documentElement.style.setProperty('--bg-url', 'url("' + pick + '")');
+    })();
   </script>
 </head>
 <body>
