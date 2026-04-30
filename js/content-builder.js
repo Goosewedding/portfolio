@@ -227,7 +227,20 @@ const ContentBuilder = (() => {
     { label: 'People 36',   src: 'icons/People36.svg'         },
     { label: 'Treasure 5',  src: 'icons/Treasures5.svg'       },
     { label: 'Treasure 20', src: 'icons/Treasures20.svg'      },
+    { label: 'Treasure 36', src: 'icons/Treasures36.svg'      },
+    { label: 'Treasure 43', src: 'icons/Treasures43.svg'      },
+    { label: 'Treasure 76', src: 'icons/Treasures76.svg'      },
+    { label: 'Treasure 80', src: 'icons/Treasures80.svg'      },
+    { label: 'Treasure 85', src: 'icons/Treasures85.svg'      },
+    { label: 'People 21',   src: 'icons/People21.svg'         },
     { label: 'Misc 2',      src: 'icons/_Ends__Odds2.svg'     },
+    { label: 'Misc 25',     src: 'icons/_Ends__Odds25.svg'    },
+    { label: '191',         src: 'icons/191.svg'              },
+    { label: '195',         src: 'icons/195.svg'              },
+    { label: '210-1',       src: 'icons/210-1.svg'            },
+    { label: '221',         src: 'icons/221.svg'              },
+    { label: '224',         src: 'icons/224.svg'              },
+    { label: 'Banner',      src: 'icons/NileKroner homepage banner.svg' },
   ];
 
   const SVG_ARROW_UP   = `<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.58824 0.79469V1.19204H6.17647H5.76471V1.58939V1.98674H5.35294H4.94118V2.38409V2.78144H4.52941H4.11765V3.1788V3.57615H3.70588H3.29412V3.9735V4.37085H2.88235H2.47059V4.7682V5.16555H2.05882H1.64706V5.5629V5.96025H1.23529H0.823529V6.3576V6.75495H0.411765H0V7.15231V7.54966H2.05882H4.11765V9.77482V12H7H9.88235V9.77617V7.55236L11.9618 7.53114L14.0412 7.50992L14.0655 7.11257L14.0898 6.71522L13.6331 6.74248L13.1765 6.76966V6.36499V5.96025H12.7647H12.3529V5.5629V5.16555H11.9412H11.5294V4.7682V4.37085H11.1176H10.7059V3.9735V3.57615H10.2941H9.88235V3.1788V2.78144H9.47059H9.05882V2.38409V1.98674H8.64706H8.23529V1.58939V1.19204H7.82353H7.41176V0.79469V0.397339H7H6.58824V0.79469ZM0.0247059 7.15231C0.0247059 7.3927 0.0401059 7.49109 0.0589647 7.37085C0.0778235 7.25061 0.0778235 7.054 0.0589647 6.93376C0.0401059 6.81352 0.0247059 6.91191 0.0247059 7.15231Z" fill="currentColor"/></svg>`;
@@ -294,6 +307,18 @@ const ContentBuilder = (() => {
     const dark = isClear ? false : isDarkFill(fill);
     wrap.style.backgroundColor = isClear ? 'transparent' : fill;
     wrap.style.color = dark ? '#FFFFFF' : '#000000';
+    if (block.cardStroke === false) wrap.style.border = 'none';
+
+    if (['text', 'image', 'video'].includes(block.type)) {
+      const widthMap = { 'full': '', '3/4': '75%', '1/2': '50%', '1/3': '33.333%' };
+      const mw = widthMap[block.cardMaxWidth] ?? '';
+      if (mw) {
+        wrap.style.maxWidth = mw;
+        const align = block.cardAlign || 'left';
+        wrap.style.marginLeft  = align === 'right'  ? 'auto' : (align === 'center' ? 'auto' : '0');
+        wrap.style.marginRight = align === 'left'   ? 'auto' : (align === 'center' ? 'auto' : '0');
+      }
+    }
 
     if (admin) wrap.appendChild(renderControls(block.id, index, total, fill, block, nextBlock));
 
@@ -471,10 +496,10 @@ const ContentBuilder = (() => {
     const actions = document.createElement('div');
     actions.className = 'cb-actions';
 
-    if (index > 0)         actions.appendChild(makeArrowBtn(SVG_SKIP_TOP,    () => moveBlockToTop(id)));
-    if (index > 0)         actions.appendChild(makeArrowBtn(SVG_ARROW_UP,    () => moveBlock(id, -1)));
-    if (index < total - 1) actions.appendChild(makeArrowBtn(SVG_ARROW_DOWN,  () => moveBlock(id,  1)));
-    if (index < total - 1) actions.appendChild(makeArrowBtn(SVG_SKIP_BOTTOM, () => moveBlockToBottom(id)));
+    actions.appendChild(makeArrowBtn(SVG_SKIP_TOP,    () => moveBlockToTop(id),    index === 0));
+    actions.appendChild(makeArrowBtn(SVG_ARROW_UP,    () => moveBlock(id, -1),     index === 0));
+    actions.appendChild(makeArrowBtn(SVG_ARROW_DOWN,  () => moveBlock(id,  1),     index === total - 1));
+    actions.appendChild(makeArrowBtn(SVG_SKIP_BOTTOM, () => moveBlockToBottom(id), index === total - 1));
 
     const hugTopBtn = document.createElement('button');
     hugTopBtn.className = 'btn--secondary cb-scale-btn';
@@ -545,6 +570,27 @@ const ContentBuilder = (() => {
 
       panel.appendChild(fillSection);
 
+      // Stroke toggle (all content blocks)
+      const strokeSection = document.createElement('div');
+      const strokeLabel = document.createElement('p');
+      strokeLabel.className = 'label';
+      strokeLabel.style.cssText = 'margin-bottom:var(--space-2); color:inherit;';
+      strokeLabel.textContent = 'Stroke';
+      strokeSection.appendChild(strokeLabel);
+
+      const strokeRow = document.createElement('div');
+      strokeRow.style.cssText = 'display:flex; gap:var(--space-2);';
+      [{ label: 'On', value: true }, { label: 'Off', value: false }].forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'btn--secondary cb-scale-btn';
+        btn.textContent = opt.label;
+        if ((block.cardStroke !== false) === opt.value) btn.classList.add('cb-scale-btn--active');
+        btn.addEventListener('click', () => setCardStroke(id, opt.value));
+        strokeRow.appendChild(btn);
+      });
+      strokeSection.appendChild(strokeRow);
+      panel.appendChild(strokeSection);
+
       // Video aspect ratio
       if (block.type === 'video') {
         const aspectSection = document.createElement('div');
@@ -566,6 +612,49 @@ const ContentBuilder = (() => {
         });
         aspectSection.appendChild(aspectRow);
         panel.appendChild(aspectSection);
+      }
+
+      // Card width + alignment (text, image, video)
+      if (['text', 'image', 'video'].includes(block.type)) {
+        const widthSection = document.createElement('div');
+        const widthLabel = document.createElement('p');
+        widthLabel.className = 'label';
+        widthLabel.style.cssText = 'margin-bottom:var(--space-2); color:inherit;';
+        widthLabel.textContent = 'Card Width';
+        widthSection.appendChild(widthLabel);
+
+        const widthRow = document.createElement('div');
+        widthRow.style.cssText = 'display:flex; flex-wrap:wrap; gap:var(--space-2);';
+        [{ label: 'Full', value: 'full' }, { label: '3/4', value: '3/4' }, { label: '1/2', value: '1/2' }, { label: '1/3', value: '1/3' }].forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'btn--secondary cb-scale-btn';
+          btn.textContent = opt.label;
+          if ((block.cardMaxWidth || 'full') === opt.value) btn.classList.add('cb-scale-btn--active');
+          btn.addEventListener('click', () => setCardMaxWidth(id, opt.value));
+          widthRow.appendChild(btn);
+        });
+        widthSection.appendChild(widthRow);
+        panel.appendChild(widthSection);
+
+        const alignSection = document.createElement('div');
+        const alignLabel2 = document.createElement('p');
+        alignLabel2.className = 'label';
+        alignLabel2.style.cssText = 'margin-bottom:var(--space-2); color:inherit;';
+        alignLabel2.textContent = 'Card Align';
+        alignSection.appendChild(alignLabel2);
+
+        const alignRow2 = document.createElement('div');
+        alignRow2.style.cssText = 'display:flex; gap:var(--space-2);';
+        [{ label: '← Left', value: 'left' }, { label: '⊛ Center', value: 'center' }, { label: 'Right →', value: 'right' }].forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'btn--secondary cb-scale-btn';
+          btn.textContent = opt.label;
+          if ((block.cardAlign || 'left') === opt.value) btn.classList.add('cb-scale-btn--active');
+          btn.addEventListener('click', () => setCardAlign(id, opt.value));
+          alignRow2.appendChild(btn);
+        });
+        alignSection.appendChild(alignRow2);
+        panel.appendChild(alignSection);
       }
 
       // Image-only controls
@@ -666,10 +755,10 @@ const ContentBuilder = (() => {
     const actions = document.createElement('div');
     actions.className = 'cb-actions';
 
-    if (index > 0)         actions.appendChild(makeArrowBtn(SVG_SKIP_TOP,    () => moveBlockToTop(id)));
-    if (index > 0)         actions.appendChild(makeArrowBtn(SVG_ARROW_UP,    () => moveBlock(id, -1)));
-    if (index < total - 1) actions.appendChild(makeArrowBtn(SVG_ARROW_DOWN,  () => moveBlock(id,  1)));
-    if (index < total - 1) actions.appendChild(makeArrowBtn(SVG_SKIP_BOTTOM, () => moveBlockToBottom(id)));
+    actions.appendChild(makeArrowBtn(SVG_SKIP_TOP,    () => moveBlockToTop(id),    index === 0));
+    actions.appendChild(makeArrowBtn(SVG_ARROW_UP,    () => moveBlock(id, -1),     index === 0));
+    actions.appendChild(makeArrowBtn(SVG_ARROW_DOWN,  () => moveBlock(id,  1),     index === total - 1));
+    actions.appendChild(makeArrowBtn(SVG_SKIP_BOTTOM, () => moveBlockToBottom(id), index === total - 1));
 
     const hugTopBtn = document.createElement('button');
     hugTopBtn.className = 'btn--secondary cb-scale-btn';
@@ -739,10 +828,10 @@ const ContentBuilder = (() => {
     const rightGroup = document.createElement('div');
     rightGroup.style.cssText = 'display:flex; align-items:center; gap:var(--space-2); margin-left:auto;';
 
-    if (index > 0)         rightGroup.appendChild(makeArrowBtn(SVG_SKIP_TOP,    () => moveBlockToTop(id)));
-    if (index > 0)         rightGroup.appendChild(makeArrowBtn(SVG_ARROW_UP,    () => moveBlock(id, -1)));
-    if (index < total - 1) rightGroup.appendChild(makeArrowBtn(SVG_ARROW_DOWN,  () => moveBlock(id,  1)));
-    if (index < total - 1) rightGroup.appendChild(makeArrowBtn(SVG_SKIP_BOTTOM, () => moveBlockToBottom(id)));
+    rightGroup.appendChild(makeArrowBtn(SVG_SKIP_TOP,    () => moveBlockToTop(id),    index === 0));
+    rightGroup.appendChild(makeArrowBtn(SVG_ARROW_UP,    () => moveBlock(id, -1),     index === 0));
+    rightGroup.appendChild(makeArrowBtn(SVG_ARROW_DOWN,  () => moveBlock(id,  1),     index === total - 1));
+    rightGroup.appendChild(makeArrowBtn(SVG_SKIP_BOTTOM, () => moveBlockToBottom(id), index === total - 1));
 
     const del = makeBtn('✕ Remove', () => deleteBlock(id));
     del.classList.add('cb-btn--delete');
@@ -993,6 +1082,27 @@ const ContentBuilder = (() => {
     render();
   }
 
+  function setCardStroke(id, val) {
+    const blocks = loadBlocks();
+    const b = findBlockInArray(blocks, id);
+    if (b) { b.cardStroke = val; saveBlocks(blocks); }
+    render();
+  }
+
+  function setCardMaxWidth(id, val) {
+    const blocks = loadBlocks();
+    const b = findBlockInArray(blocks, id);
+    if (b) { b.cardMaxWidth = val; saveBlocks(blocks); }
+    render();
+  }
+
+  function setCardAlign(id, val) {
+    const blocks = loadBlocks();
+    const b = findBlockInArray(blocks, id);
+    if (b) { b.cardAlign = val; saveBlocks(blocks); }
+    render();
+  }
+
   function setVideoAspect(id, val) {
     const blocks = loadBlocks();
     const b = findBlockInArray(blocks, id);
@@ -1078,8 +1188,8 @@ const ContentBuilder = (() => {
         const controls = document.createElement('div');
         controls.style.cssText = 'display:flex; gap:var(--space-2); margin-top:var(--space-2); flex-wrap:wrap;';
 
-        if (i > 0) controls.appendChild(makeArrowBtn(SVG_ARROW_UP, () => moveChildInGroup(group.id, child.id, -1)));
-        if (i < children.length - 1) controls.appendChild(makeArrowBtn(SVG_ARROW_DOWN, () => moveChildInGroup(group.id, child.id, 1)));
+        controls.appendChild(makeArrowBtn(SVG_ARROW_UP,   () => moveChildInGroup(group.id, child.id, -1), i === 0));
+        controls.appendChild(makeArrowBtn(SVG_ARROW_DOWN, () => moveChildInGroup(group.id, child.id,  1), i === children.length - 1));
 
         const del = makeBtn('✕ Remove', () => deleteChildFromGroup(group.id, child.id));
         del.classList.add('cb-btn--delete');
@@ -1578,11 +1688,11 @@ const ContentBuilder = (() => {
     return btn;
   }
 
-  function makeArrowBtn(svgHtml, onClick) {
+  function makeArrowBtn(svgHtml, onClick, disabled) {
     const btn = document.createElement('button');
-    btn.className = 'btn--secondary';
+    btn.className = disabled ? 'btn--disabled' : 'btn--secondary';
     btn.innerHTML = svgHtml;
-    btn.addEventListener('click', onClick);
+    if (!disabled) btn.addEventListener('click', onClick);
     return btn;
   }
 

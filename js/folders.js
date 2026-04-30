@@ -17,6 +17,9 @@ const Folders = (() => {
         { href: 'ux-project-04.html', label: 'Project 04' },
         { href: 'ux-project-05.html', label: 'Project 05' },
         { href: 'ux-project-06.html', label: 'Project 06' },
+        { href: 'ux-project-07.html', label: 'Project 07' },
+        { href: 'ux-project-08.html', label: 'Project 08' },
+        { href: 'ux-project-09.html', label: 'Project 09' },
       ],
     },
     {
@@ -28,6 +31,9 @@ const Folders = (() => {
         { href: 'motion-project-04.html', label: 'Project 04' },
         { href: 'motion-project-05.html', label: 'Project 05' },
         { href: 'motion-project-06.html', label: 'Project 06' },
+        { href: 'motion-project-07.html', label: 'Project 07' },
+        { href: 'motion-project-08.html', label: 'Project 08' },
+        { href: 'motion-project-09.html', label: 'Project 09' },
       ],
     },
     {
@@ -39,12 +45,18 @@ const Folders = (() => {
         { href: 'graphic-project-04.html', label: 'Project 04' },
         { href: 'graphic-project-05.html', label: 'Project 05' },
         { href: 'graphic-project-06.html', label: 'Project 06' },
+        { href: 'graphic-project-07.html', label: 'Project 07' },
+        { href: 'graphic-project-08.html', label: 'Project 08' },
+        { href: 'graphic-project-09.html', label: 'Project 09' },
       ],
     },
     {
       label: 'The Perpetual World',
       projects: [
         { href: 'perpetual-world-manifesto.html', label: 'The Perpetual World Manifesto' },
+        { href: 'perpetual-world-project-01.html', label: 'Project 01' },
+        { href: 'perpetual-world-project-02.html', label: 'Project 02' },
+        { href: 'perpetual-world-project-03.html', label: 'Project 03' },
       ],
     },
     {
@@ -60,6 +72,9 @@ const Folders = (() => {
         { href: 'misc-project-08.html', label: 'Project 08' },
         { href: 'misc-project-09.html', label: 'Project 09' },
         { href: 'misc-project-10.html', label: 'Project 10' },
+        { href: 'misc-project-11.html', label: 'Project 11' },
+        { href: 'misc-project-12.html', label: 'Project 12' },
+        { href: 'misc-project-13.html', label: 'Project 13' },
       ],
     },
   ];
