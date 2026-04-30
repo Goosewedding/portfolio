@@ -2325,16 +2325,18 @@ const ContentBuilder = (() => {
     const savedFolderStyle = localStorage.getItem('header_folder_style_' + slug) || 'black';
     if (backLink) backLink.classList.add('btn--text--' + savedFolderStyle);
     const saved = localStorage.getItem(headerFillKey());
-    if (!saved) return;
-    const opacity = parseInt(localStorage.getItem('header_opacity_' + slug) ?? '100', 10);
-    const r = parseInt(saved.slice(1,3), 16);
-    const g = parseInt(saved.slice(3,5), 16);
-    const b = parseInt(saved.slice(5,7), 16);
     const savedTextColor = localStorage.getItem('header_text_color_' + slug);
-    titleCard.style.backgroundColor = opacity < 100 ? `rgba(${r},${g},${b},${opacity/100})` : saved;
-    titleCard.style.borderColor = isDarkFill(saved) ? '#FFFFFF' : '#000000';
-    const textColor = savedTextColor || (isDarkFill(saved) ? '#FFFFFF' : '#000000');
-    h1.style.color = textColor;
+    if (saved) {
+      const opacity = parseInt(localStorage.getItem('header_opacity_' + slug) ?? '100', 10);
+      const r = parseInt(saved.slice(1,3), 16);
+      const g = parseInt(saved.slice(3,5), 16);
+      const b = parseInt(saved.slice(5,7), 16);
+      titleCard.style.backgroundColor = opacity < 100 ? `rgba(${r},${g},${b},${opacity/100})` : saved;
+      titleCard.style.borderColor = isDarkFill(saved) ? '#FFFFFF' : '#000000';
+      h1.style.color = savedTextColor || (isDarkFill(saved) ? '#FFFFFF' : '#000000');
+    } else if (savedTextColor) {
+      h1.style.color = savedTextColor;
+    }
   }
 
 
