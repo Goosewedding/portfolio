@@ -343,7 +343,6 @@ const ContentBuilder = (() => {
       const justifyMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
 
       if (hug) {
-        const maxScale = Math.max(...images.map(i => i.scale || 100));
         wrap.style.backgroundColor = 'transparent';
         wrap.style.border = 'none';
         wrap.style.display = 'flex';
@@ -351,7 +350,7 @@ const ContentBuilder = (() => {
         wrap.style.alignItems = 'flex-start';
         imgWrap.style.backgroundColor = fill;
         imgWrap.style.border = '1px solid #000000';
-        imgWrap.style.width = maxScale + '%';
+        imgWrap.style.width = 'fit-content';
       } else if (pad === 'centered') {
         imgWrap.style.padding = '32px';
         imgWrap.style.display = 'flex';
@@ -376,10 +375,11 @@ const ContentBuilder = (() => {
         img.src       = imgData.src;
         img.alt       = imgData.alt || '';
         img.className = 'cb-image';
-        if (hug) {
-          img.style.width = '100%';
-        } else {
-          img.style.width = (imgData.scale || 100) + '%';
+        if (imgData.heightPx || imgData.widthPx) {
+          img.style.height = imgData.heightPx ? imgData.heightPx + 'px' : 'auto';
+          img.style.width  = imgData.widthPx  ? imgData.widthPx  + 'px' : 'auto';
+        }
+        if (!hug) {
           if (align === 'center') { img.style.marginLeft = 'auto'; img.style.marginRight = 'auto'; }
           else if (align === 'right') { img.style.marginLeft = 'auto'; img.style.marginRight = '0'; }
         }
@@ -389,21 +389,69 @@ const ContentBuilder = (() => {
           const imgControls = document.createElement('div');
           imgControls.className = 'cb-image-controls';
 
-          // Scale buttons
-          const scaleLabel = document.createElement('span');
-          scaleLabel.className = 'label';
-          scaleLabel.style.cssText = 'color:inherit; margin-right:var(--space-2);';
-          scaleLabel.textContent = 'Scale:';
-          imgControls.appendChild(scaleLabel);
+          // H / W pixel inputs
+          const inputCss = 'width:60px; height:24px; padding:0 6px; border:1px solid currentColor; background:transparent; color:inherit; font-size:12px;';
+          const labelCss = 'color:inherit; margin-right:4px;';
 
-          [25, 50, 75, 100].forEach(pct => {
-            const btn = document.createElement('button');
-            btn.className = 'btn--secondary cb-scale-btn';
-            btn.textContent = pct + '%';
-            if (pct === (imgData.scale || 100)) btn.classList.add('cb-scale-btn--active');
-            btn.addEventListener('click', () => setImageScale(block.id, imgIndex, pct));
-            imgControls.appendChild(btn);
+          const hLabel = document.createElement('span');
+          hLabel.className = 'label';
+          hLabel.style.cssText = labelCss;
+          hLabel.textContent = 'H:';
+          imgControls.appendChild(hLabel);
+
+          const heightInput = document.createElement('input');
+          heightInput.type = 'number';
+          heightInput.min = '10';
+          heightInput.step = '10';
+          heightInput.value = imgData.heightPx || '';
+          heightInput.style.cssText = inputCss;
+          imgControls.appendChild(heightInput);
+
+          const wLabel = document.createElement('span');
+          wLabel.className = 'label';
+          wLabel.style.cssText = 'color:inherit; margin:0 4px;';
+          wLabel.textContent = 'W:';
+          imgControls.appendChild(wLabel);
+
+          const widthInput = document.createElement('input');
+          widthInput.type = 'number';
+          widthInput.min = '10';
+          widthInput.step = '10';
+          widthInput.value = imgData.widthPx || '';
+          widthInput.style.cssText = inputCss;
+          imgControls.appendChild(widthInput);
+
+          const pxLabel = document.createElement('span');
+          pxLabel.className = 'label';
+          pxLabel.style.cssText = 'color:inherit; margin-left:4px;';
+          pxLabel.textContent = 'px';
+          imgControls.appendChild(pxLabel);
+
+          const setPlaceholders = () => {
+            if (!heightInput.value) heightInput.placeholder = img.naturalHeight || '';
+            if (!widthInput.value)  widthInput.placeholder  = img.naturalWidth  || '';
+          };
+          if (img.complete && img.naturalHeight) setPlaceholders();
+          else img.addEventListener('load', setPlaceholders);
+
+          const saveSize = () => {
+            const h = parseInt(heightInput.value, 10);
+            const w = parseInt(widthInput.value, 10);
+            setImageSize(block.id, imgIndex, isNaN(h) ? null : h, isNaN(w) ? null : w);
+          };
+          heightInput.addEventListener('change', saveSize);
+          widthInput.addEventListener('change', saveSize);
+
+          const resetBtn = document.createElement('button');
+          resetBtn.className = 'btn--secondary';
+          resetBtn.style.cssText = 'margin-left:4px;';
+          resetBtn.textContent = 'Reset';
+          resetBtn.addEventListener('click', () => {
+            heightInput.value = '';
+            widthInput.value = '';
+            setImageSize(block.id, imgIndex, null, null);
           });
+          imgControls.appendChild(resetBtn);
 
           // Remove this image
           if (images.length > 1) {
@@ -987,16 +1035,17 @@ const ContentBuilder = (() => {
   // Migrate old single-image blocks to images array format
   function normalizeImages(block) {
     if (block.images) return block.images;
-    if (block.src) return [{ src: block.src, alt: block.alt || '', scale: block.scale || 100 }];
+    if (block.src) return [{ src: block.src, alt: block.alt || '' }];
     return [];
   }
 
-  function setImageScale(blockId, imgIndex, scale) {
+  function setImageSize(blockId, imgIndex, heightPx, widthPx) {
     const blocks = loadBlocks();
     const b = findBlockInArray(blocks, blockId);
     if (b) {
       const images = normalizeImages(b);
-      images[imgIndex].scale = scale;
+      images[imgIndex].heightPx = heightPx;
+      images[imgIndex].widthPx  = widthPx;
       b.images = images;
       delete b.src; delete b.alt; delete b.scale;
       saveBlocks(blocks);
@@ -1241,25 +1290,78 @@ const ContentBuilder = (() => {
         img.src = imgData.src;
         img.alt = imgData.alt || '';
         img.className = 'cb-image';
-        img.style.width = (imgData.scale || 100) + '%';
+        if (imgData.heightPx || imgData.widthPx) {
+          img.style.height = imgData.heightPx ? imgData.heightPx + 'px' : 'auto';
+          img.style.width  = imgData.widthPx  ? imgData.widthPx  + 'px' : 'auto';
+        }
         imgRow.appendChild(img);
 
         if (admin) {
           const imgControls = document.createElement('div');
           imgControls.className = 'cb-image-controls';
-          const scaleLabel = document.createElement('span');
-          scaleLabel.className = 'label';
-          scaleLabel.style.cssText = 'color:inherit; margin-right:var(--space-2);';
-          scaleLabel.textContent = 'Scale:';
-          imgControls.appendChild(scaleLabel);
-          [25, 50, 75, 100].forEach(pct => {
-            const btn = document.createElement('button');
-            btn.className = 'btn--secondary cb-scale-btn';
-            btn.textContent = pct + '%';
-            if (pct === (imgData.scale || 100)) btn.classList.add('cb-scale-btn--active');
-            btn.addEventListener('click', () => setImageScale(child.id, imgIndex, pct));
-            imgControls.appendChild(btn);
+          const inputCss = 'width:60px; height:24px; padding:0 6px; border:1px solid currentColor; background:transparent; color:inherit; font-size:12px;';
+          const labelCss = 'color:inherit; margin-right:4px;';
+
+          const hLabel = document.createElement('span');
+          hLabel.className = 'label';
+          hLabel.style.cssText = labelCss;
+          hLabel.textContent = 'H:';
+          imgControls.appendChild(hLabel);
+
+          const heightInput = document.createElement('input');
+          heightInput.type = 'number';
+          heightInput.min = '10';
+          heightInput.step = '10';
+          heightInput.value = imgData.heightPx || '';
+          heightInput.style.cssText = inputCss;
+          imgControls.appendChild(heightInput);
+
+          const wLabel = document.createElement('span');
+          wLabel.className = 'label';
+          wLabel.style.cssText = 'color:inherit; margin:0 4px;';
+          wLabel.textContent = 'W:';
+          imgControls.appendChild(wLabel);
+
+          const widthInput = document.createElement('input');
+          widthInput.type = 'number';
+          widthInput.min = '10';
+          widthInput.step = '10';
+          widthInput.value = imgData.widthPx || '';
+          widthInput.style.cssText = inputCss;
+          imgControls.appendChild(widthInput);
+
+          const pxLabel = document.createElement('span');
+          pxLabel.className = 'label';
+          pxLabel.style.cssText = 'color:inherit; margin-left:4px;';
+          pxLabel.textContent = 'px';
+          imgControls.appendChild(pxLabel);
+
+          const setPlaceholders = () => {
+            if (!heightInput.value) heightInput.placeholder = img.naturalHeight || '';
+            if (!widthInput.value)  widthInput.placeholder  = img.naturalWidth  || '';
+          };
+          if (img.complete && img.naturalHeight) setPlaceholders();
+          else img.addEventListener('load', setPlaceholders);
+
+          const saveSize = () => {
+            const h = parseInt(heightInput.value, 10);
+            const w = parseInt(widthInput.value, 10);
+            setImageSize(child.id, imgIndex, isNaN(h) ? null : h, isNaN(w) ? null : w);
+          };
+          heightInput.addEventListener('change', saveSize);
+          widthInput.addEventListener('change', saveSize);
+
+          const resetBtn = document.createElement('button');
+          resetBtn.className = 'btn--secondary';
+          resetBtn.style.cssText = 'margin-left:4px;';
+          resetBtn.textContent = 'Reset';
+          resetBtn.addEventListener('click', () => {
+            heightInput.value = '';
+            widthInput.value = '';
+            setImageSize(child.id, imgIndex, null, null);
           });
+          imgControls.appendChild(resetBtn);
+
           if (images.length > 1) {
             const removeBtn = document.createElement('button');
             removeBtn.className = 'btn--secondary cb-btn--delete';
