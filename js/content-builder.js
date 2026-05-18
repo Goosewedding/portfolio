@@ -334,42 +334,45 @@ const ContentBuilder = (() => {
       wrap.classList.add('cb-block--image');
       const images = normalizeImages(block);
       const imgWrap = document.createElement('div');
-      imgWrap.className = 'cb-image-wrap';
+      const gridMode = !!block.imageGridMode;
 
-      // Apply padding and alignment settings
       const pad   = block.imagePadding;
       const align = block.imageAlign || 'left';
       const hug   = pad === 'hug';
+      const flow  = block.imageFlow || 'vertical';
       const justifyMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
 
-      if (hug) {
-        wrap.style.backgroundColor = 'transparent';
-        wrap.style.border = 'none';
-        wrap.style.display = 'flex';
-        wrap.style.justifyContent = justifyMap[align] || 'flex-start';
-        wrap.style.alignItems = 'flex-start';
-        imgWrap.style.backgroundColor = fill;
-        imgWrap.style.border = '1px solid #000000';
-        imgWrap.style.width = 'fit-content';
-      } else if (pad === 'centered') {
-        imgWrap.style.padding = '32px';
-        imgWrap.style.display = 'flex';
-        imgWrap.style.flexDirection = 'column';
-        imgWrap.style.alignItems = 'center';
-      } else if (pad) {
-        imgWrap.style.padding = pad + 'px';
-      }
-
-      const flow = block.imageFlow || 'vertical';
-      if (flow === 'horizontal') {
-        imgWrap.style.flexDirection = 'row';
-        imgWrap.style.alignItems = 'flex-start';
+      if (gridMode) {
+        imgWrap.className = 'cb-block-image-grid';
+      } else {
+        imgWrap.className = 'cb-image-wrap';
+        if (hug) {
+          wrap.style.backgroundColor = 'transparent';
+          wrap.style.border = 'none';
+          wrap.style.display = 'flex';
+          wrap.style.justifyContent = justifyMap[align] || 'flex-start';
+          wrap.style.alignItems = 'flex-start';
+          imgWrap.style.backgroundColor = fill;
+          imgWrap.style.border = '1px solid #000000';
+          imgWrap.style.width = 'fit-content';
+        } else if (pad === 'centered') {
+          imgWrap.style.padding = '32px';
+          imgWrap.style.display = 'flex';
+          imgWrap.style.flexDirection = 'column';
+          imgWrap.style.alignItems = 'center';
+        } else if (pad) {
+          imgWrap.style.padding = pad + 'px';
+        }
+        if (flow === 'horizontal') {
+          imgWrap.style.flexDirection = 'row';
+          imgWrap.style.alignItems = 'flex-start';
+        }
       }
 
       images.forEach((imgData, imgIndex) => {
         const imgRow = document.createElement('div');
         imgRow.className = 'cb-image-row';
-        if (flow === 'horizontal') imgRow.style.flex = '1';
+        if (!gridMode && flow === 'horizontal') imgRow.style.flex = '1';
 
         const img = document.createElement('img');
         img.src       = imgData.src;
@@ -379,7 +382,7 @@ const ContentBuilder = (() => {
           img.style.height = imgData.heightPx ? imgData.heightPx + 'px' : 'auto';
           img.style.width  = imgData.widthPx  ? imgData.widthPx  + 'px' : 'auto';
         }
-        if (!hug) {
+        if (!gridMode && !hug) {
           if (align === 'center') { img.style.marginLeft = 'auto'; img.style.marginRight = 'auto'; }
           else if (align === 'right') { img.style.marginLeft = 'auto'; img.style.marginRight = '0'; }
         }
@@ -388,6 +391,31 @@ const ContentBuilder = (() => {
         if (admin) {
           const imgControls = document.createElement('div');
           imgControls.className = 'cb-image-controls';
+
+          // Block-level grid toggle (first image only)
+          if (imgIndex === 0) {
+            const gridBtn = document.createElement('button');
+            gridBtn.className = 'btn--secondary';
+            gridBtn.style.marginRight = '4px';
+            gridBtn.textContent = '+ Image Grid';
+            gridBtn.addEventListener('click', () => {
+              if (gridMode) {
+                openImagePicker(block.id);
+              } else {
+                enableImageGrid(block.id);
+              }
+            });
+            imgControls.appendChild(gridBtn);
+
+            if (gridMode) {
+              const removeGridBtn = document.createElement('button');
+              removeGridBtn.className = 'btn--secondary cb-btn--delete';
+              removeGridBtn.style.marginRight = '8px';
+              removeGridBtn.textContent = '✕ Remove Grid';
+              removeGridBtn.addEventListener('click', () => disableImageGrid(block.id));
+              imgControls.appendChild(removeGridBtn);
+            }
+          }
 
           // H / W pixel inputs
           const inputCss = 'width:60px; height:24px; padding:0 6px; border:1px solid currentColor; background:transparent; color:inherit; font-size:12px;';
@@ -759,8 +787,8 @@ const ContentBuilder = (() => {
         alignSection.appendChild(alignRow);
         panel.appendChild(alignSection);
 
-        // Layout (2+ images only)
-        if (normalizeImages(block).length > 1) {
+        // Layout (2+ images only, not in grid mode)
+        if (normalizeImages(block).length > 1 && !block.imageGridMode) {
           const flowSection = document.createElement('div');
           const flowLabel = document.createElement('p');
           flowLabel.className = 'label';
@@ -1100,6 +1128,30 @@ const ContentBuilder = (() => {
     render();
   }
 
+  function enableImageGrid(blockId) {
+    const blocks = loadBlocks();
+    const b = findBlockInArray(blocks, blockId);
+    if (b) {
+      b.imageGridMode = true;
+      saveBlocks(blocks);
+    }
+    render();
+    openImagePicker(blockId);
+  }
+
+  function disableImageGrid(blockId) {
+    const blocks = loadBlocks();
+    const b = findBlockInArray(blocks, blockId);
+    if (b) {
+      b.imageGridMode = false;
+      const images = normalizeImages(b);
+      b.images = images.slice(0, 1);
+      delete b.src; delete b.alt; delete b.scale;
+      saveBlocks(blocks);
+    }
+    render();
+  }
+
   function toggleHugTop(id) {
     const blocks = loadBlocks();
     const b = blocks.find(b => b.id === id);
@@ -1279,9 +1331,15 @@ const ContentBuilder = (() => {
     if (child.type === 'image') {
       const images = normalizeImages(child);
       const imgWrap = document.createElement('div');
-      imgWrap.className = 'cb-image-wrap';
-      const pad = child.imagePadding;
-      if (pad && pad !== 'hug') imgWrap.style.padding = isNaN(pad) ? '32px' : pad + 'px';
+      const gridMode = !!child.imageGridMode;
+
+      if (gridMode) {
+        imgWrap.className = 'cb-block-image-grid';
+      } else {
+        imgWrap.className = 'cb-image-wrap';
+        const pad = child.imagePadding;
+        if (pad && pad !== 'hug') imgWrap.style.padding = isNaN(pad) ? '32px' : pad + 'px';
+      }
 
       images.forEach((imgData, imgIndex) => {
         const imgRow = document.createElement('div');
@@ -1301,6 +1359,31 @@ const ContentBuilder = (() => {
           imgControls.className = 'cb-image-controls';
           const inputCss = 'width:60px; height:24px; padding:0 6px; border:1px solid currentColor; background:transparent; color:inherit; font-size:12px;';
           const labelCss = 'color:inherit; margin-right:4px;';
+
+          // Block-level grid toggle (first image only)
+          if (imgIndex === 0) {
+            const gridBtn = document.createElement('button');
+            gridBtn.className = 'btn--secondary';
+            gridBtn.style.marginRight = '4px';
+            gridBtn.textContent = '+ Image Grid';
+            gridBtn.addEventListener('click', () => {
+              if (gridMode) {
+                openImagePicker(child.id);
+              } else {
+                enableImageGrid(child.id);
+              }
+            });
+            imgControls.appendChild(gridBtn);
+
+            if (gridMode) {
+              const removeGridBtn = document.createElement('button');
+              removeGridBtn.className = 'btn--secondary cb-btn--delete';
+              removeGridBtn.style.marginRight = '8px';
+              removeGridBtn.textContent = '✕ Remove Grid';
+              removeGridBtn.addEventListener('click', () => disableImageGrid(child.id));
+              imgControls.appendChild(removeGridBtn);
+            }
+          }
 
           const hLabel = document.createElement('span');
           hLabel.className = 'label';
@@ -2495,3 +2578,17 @@ const ContentBuilder = (() => {
 })();
 
 document.addEventListener('DOMContentLoaded', () => ContentBuilder.init());
+
+// Back to Top button
+(function () {
+  const btn = document.createElement('button');
+  btn.id = 'back-to-top';
+  btn.className = 'btn--outline';
+  btn.textContent = 'Back to Top';
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  document.body.appendChild(btn);
+
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('is-visible', window.scrollY > 300);
+  }, { passive: true });
+})();
