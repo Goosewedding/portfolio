@@ -273,6 +273,20 @@ const ContentBuilder = (() => {
     wrap.className = 'cb-block';
     if (block.hugTop) wrap.classList.add('cb-block--hug-top');
 
+    // ── Divider block ────────────────────────────────────────
+    if (block.type === 'divider') {
+      if (admin) {
+        wrap.style.cssText = 'background-color:rgba(255,255,255,0.5); border:1px dashed #D4D4D4; padding:var(--space-3);';
+        wrap.appendChild(renderControls(block.id, index, total, null, block, nextBlock));
+      } else {
+        wrap.style.cssText = 'background:transparent; border:none; padding:0;';
+      }
+      const line = document.createElement('div');
+      line.style.cssText = 'border-top:1px solid #000000; width:100%;';
+      wrap.appendChild(line);
+      return wrap;
+    }
+
     // ── Section block ────────────────────────────────────────
     if (block.type === 'section') {
       if (admin) {
@@ -310,13 +324,19 @@ const ContentBuilder = (() => {
     if (block.cardStroke === false) wrap.style.border = 'none';
 
     if (['text', 'image', 'video'].includes(block.type)) {
-      const widthMap = { 'full': '', '3/4': '75%', '1/2': '50%', '1/3': '33.333%' };
-      const mw = widthMap[block.cardMaxWidth] ?? '';
-      if (mw) {
-        wrap.style.maxWidth = mw;
-        const align = block.cardAlign || 'left';
+      const align = block.cardAlign || 'left';
+      if (block.cardWidthPx) {
+        wrap.style.maxWidth    = block.cardWidthPx + 'px';
         wrap.style.marginLeft  = align === 'right'  ? 'auto' : (align === 'center' ? 'auto' : '0');
         wrap.style.marginRight = align === 'left'   ? 'auto' : (align === 'center' ? 'auto' : '0');
+      } else {
+        const widthMap = { 'full': '', '3/4': '75%', '1/2': '50%', '1/3': '33.333%' };
+        const mw = widthMap[block.cardMaxWidth] ?? '';
+        if (mw) {
+          wrap.style.maxWidth    = mw;
+          wrap.style.marginLeft  = align === 'right'  ? 'auto' : (align === 'center' ? 'auto' : '0');
+          wrap.style.marginRight = align === 'left'   ? 'auto' : (align === 'center' ? 'auto' : '0');
+        }
       }
     }
 
@@ -328,6 +348,7 @@ const ContentBuilder = (() => {
       wrap.appendChild(el);
 
     } else if (block.type === 'group') {
+      wrap.classList.add('cb-block--group');
       wrap.appendChild(renderGroupChildren(block, admin));
 
     } else if (block.type === 'image') {
@@ -710,6 +731,43 @@ const ContentBuilder = (() => {
           widthRow.appendChild(btn);
         });
         widthSection.appendChild(widthRow);
+
+        if (block.type === 'text' || block.type === 'image') {
+          const pxRow = document.createElement('div');
+          pxRow.style.cssText = 'display:flex; align-items:center; gap:var(--space-2); margin-top:var(--space-2);';
+
+          const pxLabel = document.createElement('span');
+          pxLabel.className = 'label';
+          pxLabel.style.cssText = 'color:inherit;';
+          pxLabel.textContent = 'W px:';
+
+          const pxInput = document.createElement('input');
+          pxInput.type = 'number';
+          pxInput.min = '10';
+          pxInput.step = '10';
+          pxInput.value = block.cardWidthPx || '';
+          pxInput.placeholder = 'e.g. 400';
+          pxInput.style.cssText = 'width:80px; height:24px; padding:0 6px; border:1px solid currentColor; background:transparent; color:inherit; font-size:12px;';
+
+          const pxResetBtn = document.createElement('button');
+          pxResetBtn.className = 'btn--secondary';
+          pxResetBtn.textContent = 'Reset';
+          pxResetBtn.addEventListener('click', () => {
+            pxInput.value = '';
+            setCardWidthPx(id, null);
+          });
+
+          pxInput.addEventListener('change', () => {
+            const v = parseInt(pxInput.value, 10);
+            setCardWidthPx(id, isNaN(v) ? null : v);
+          });
+
+          pxRow.appendChild(pxLabel);
+          pxRow.appendChild(pxInput);
+          pxRow.appendChild(pxResetBtn);
+          widthSection.appendChild(pxRow);
+        }
+
         panel.appendChild(widthSection);
 
         const alignSection = document.createElement('div');
@@ -1008,6 +1066,11 @@ const ContentBuilder = (() => {
     groupBtn.textContent = '+ Group Block';
     groupBtn.addEventListener('click', () => addBlock({ type: 'group', fill: '#FFFFFF', children: [{ id: uid(), type: 'text', content: '' }] }));
 
+    const dividerBtn = document.createElement('button');
+    dividerBtn.className = 'btn--secondary';
+    dividerBtn.textContent = '+ Divider';
+    dividerBtn.addEventListener('click', () => addBlock({ type: 'divider' }));
+
     bar.appendChild(textBtn);
     bar.appendChild(imgBtn);
     bar.appendChild(vidBtn);
@@ -1015,6 +1078,7 @@ const ContentBuilder = (() => {
     bar.appendChild(spacerBtn);
     bar.appendChild(sectionBtn);
     bar.appendChild(groupBtn);
+    bar.appendChild(dividerBtn);
     return bar;
   }
 
@@ -1204,6 +1268,17 @@ const ContentBuilder = (() => {
     render();
   }
 
+  function setCardWidthPx(id, val) {
+    const blocks = loadBlocks();
+    const b = findBlockInArray(blocks, id);
+    if (b) {
+      if (val === null) delete b.cardWidthPx;
+      else b.cardWidthPx = val;
+      saveBlocks(blocks);
+    }
+    render();
+  }
+
   function setVideoAspect(id, val) {
     const blocks = loadBlocks();
     const b = findBlockInArray(blocks, id);
@@ -1280,7 +1355,7 @@ const ContentBuilder = (() => {
 
     children.forEach((child, i) => {
       const childWrap = document.createElement('div');
-      if (i > 0) childWrap.style.cssText = 'border-top:1px solid ' + (dark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)') + '; padding-top:var(--space-4);';
+      if (i > 0) childWrap.style.cssText = 'padding-top:var(--space-4);';
 
       const content = renderGroupChildContent(child, group, admin);
       childWrap.appendChild(content);
@@ -1309,10 +1384,14 @@ const ContentBuilder = (() => {
       const m = makeBtn('+ Image',      () => openImagePicker(null, group.id));
       const v = makeBtn('+ Video',      () => openVideoPicker(null, group.id));
       const s = makeBtn('+ SoundCloud', () => openSoundCloudPicker(null, group.id));
+      const d = makeBtn('+ Divider',    () => addChildToGroup(group.id, { type: 'divider' }));
+      const p = makeBtn('+ Padding',    () => addChildToGroup(group.id, { type: 'spacer', spacerHeight: 32 }));
       addBar.appendChild(t);
       addBar.appendChild(m);
       addBar.appendChild(v);
       addBar.appendChild(s);
+      addBar.appendChild(d);
+      addBar.appendChild(p);
       container.appendChild(addBar);
     }
 
@@ -1519,6 +1598,20 @@ const ContentBuilder = (() => {
         scWrap.appendChild(urlBtn);
       }
       return scWrap;
+    }
+
+    if (child.type === 'divider') {
+      const line = document.createElement('div');
+      line.style.cssText = 'border-top:1px solid ' + (dark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.2)') + '; width:100%;';
+      return line;
+    }
+
+    if (child.type === 'spacer') {
+      const height = child.spacerHeight || 32;
+      const el = document.createElement('div');
+      el.style.height = height + 'px';
+      if (admin) el.style.cssText = 'height:' + height + 'px; background:rgba(255,255,255,0.5); border:1px dashed #D4D4D4;';
+      return el;
     }
 
     return document.createElement('div');
@@ -2263,68 +2356,8 @@ const ContentBuilder = (() => {
     panel.style.cssText = 'margin-top:var(--space-3); padding:var(--space-3) var(--space-4); border:1px solid #000; background:#fff; flex-direction:column; gap:var(--space-4);';
     panel.style.display = 'none';
 
-    // Fill section
-    const fillKey      = headerFillKey();
-    const opacityKey   = 'header_opacity_' + filename.replace('.html', '');
     const textColorKey = 'header_text_color_' + filename.replace('.html', '');
-    const savedFill    = localStorage.getItem(fillKey);
     const titleCard    = h1.parentElement;
-
-    function applyFill(hex, opacity) {
-      if (opacity === undefined) opacity = parseInt(localStorage.getItem(opacityKey) ?? '100', 10);
-      const r = parseInt(hex.slice(1,3), 16);
-      const g = parseInt(hex.slice(3,5), 16);
-      const b = parseInt(hex.slice(5,7), 16);
-      titleCard.style.backgroundColor = opacity < 100 ? `rgba(${r},${g},${b},${opacity/100})` : hex;
-      titleCard.style.borderColor = isDarkFill(hex) ? '#FFFFFF' : '#000000';
-      const savedTextColor = localStorage.getItem(textColorKey);
-      const textColor = savedTextColor || (isDarkFill(hex) ? '#FFFFFF' : '#000000');
-      h1.style.color = textColor;
-    }
-
-    const fillLabel = document.createElement('p');
-    fillLabel.className = 'label';
-    fillLabel.style.marginBottom = 'var(--space-2)';
-    fillLabel.textContent = 'Header Fill';
-    panel.appendChild(fillLabel);
-    panel.appendChild(makeSwatchRow(savedFill || '#FFFFFF', hex => {
-      localStorage.setItem(fillKey, hex);
-      applyFill(hex);
-    }));
-
-    // Opacity slider
-    const opacityLabel = document.createElement('p');
-    opacityLabel.className = 'label';
-    opacityLabel.style.cssText = 'margin-bottom:var(--space-2); margin-top:var(--space-3);';
-    opacityLabel.textContent = 'Opacity';
-    panel.appendChild(opacityLabel);
-
-    const opacityRow = document.createElement('div');
-    opacityRow.style.cssText = 'display:flex; align-items:center; gap:var(--space-2);';
-
-    const savedOpacity = parseInt(localStorage.getItem(opacityKey) ?? '100', 10);
-    const opacitySlider = document.createElement('input');
-    opacitySlider.type = 'range';
-    opacitySlider.min = '0';
-    opacitySlider.max = '100';
-    opacitySlider.value = savedOpacity;
-    opacitySlider.style.cssText = 'flex:1;';
-
-    const opacityDisplay = document.createElement('span');
-    opacityDisplay.className = 'label';
-    opacityDisplay.style.cssText = 'width:3em; text-align:right;';
-    opacityDisplay.textContent = savedOpacity + '%';
-
-    opacitySlider.addEventListener('input', () => {
-      const val = parseInt(opacitySlider.value, 10);
-      opacityDisplay.textContent = val + '%';
-      localStorage.setItem(opacityKey, val);
-      applyFill(localStorage.getItem(fillKey) || '#FFFFFF', val);
-    });
-
-    opacityRow.appendChild(opacitySlider);
-    opacityRow.appendChild(opacityDisplay);
-    panel.appendChild(opacityRow);
 
     // Text color
     const textColorLabel = document.createElement('p');
@@ -2333,11 +2366,11 @@ const ContentBuilder = (() => {
     textColorLabel.textContent = 'Header Text Color';
     panel.appendChild(textColorLabel);
     const savedTextColor = localStorage.getItem(textColorKey);
-    panel.appendChild(makeSwatchRow(savedTextColor || (isDarkFill(savedFill || '#FFFFFF') ? '#FFFFFF' : '#000000'), hex => {
+    panel.appendChild(makeSwatchRow(savedTextColor || '#000000', hex => {
       localStorage.setItem(textColorKey, hex);
       h1.style.color = hex;
-      const backLink = titleCard.querySelector('.btn--secondary');
-      if (backLink) backLink.style.color = hex;
+      const folderBtn = titleCard.querySelector('.btn--text');
+      if (folderBtn) folderBtn.style.color = hex;
     }));
 
     // Icon section
@@ -2380,38 +2413,6 @@ const ContentBuilder = (() => {
         iconRow.appendChild(iconBtn);
       });
     }
-
-    // Folder button style
-    const folderStyleKey = 'header_folder_style_' + filename.replace('.html', '');
-    const savedFolderStyle = localStorage.getItem(folderStyleKey) || 'black';
-    const backLink = titleCard.querySelector('.btn--text');
-    if (backLink) backLink.classList.add('btn--text--' + savedFolderStyle);
-
-    const folderStyleLabel = document.createElement('p');
-    folderStyleLabel.className = 'label';
-    folderStyleLabel.style.cssText = 'margin-bottom:var(--space-2); margin-top:var(--space-3);';
-    folderStyleLabel.textContent = 'Folder Button';
-    panel.appendChild(folderStyleLabel);
-
-    const folderStyleRow = document.createElement('div');
-    folderStyleRow.style.cssText = 'display:flex; gap:var(--space-2);';
-    ['black', 'white'].forEach(variant => {
-      const btn = document.createElement('button');
-      btn.className = 'btn--secondary cb-scale-btn';
-      btn.textContent = variant.charAt(0).toUpperCase() + variant.slice(1);
-      if (variant === savedFolderStyle) btn.classList.add('cb-scale-btn--active');
-      btn.addEventListener('click', () => {
-        folderStyleRow.querySelectorAll('.cb-scale-btn').forEach(b => b.classList.remove('cb-scale-btn--active'));
-        btn.classList.add('cb-scale-btn--active');
-        localStorage.setItem(folderStyleKey, variant);
-        if (backLink) {
-          backLink.classList.remove('btn--text--black', 'btn--text--white');
-          backLink.classList.add('btn--text--' + variant);
-        }
-      });
-      folderStyleRow.appendChild(btn);
-    });
-    panel.appendChild(folderStyleRow);
 
     let iconsLoaded = false;
     gearBtn.addEventListener('click', e => {
@@ -2497,32 +2498,6 @@ const ContentBuilder = (() => {
 
   // ── Header fill ───────────────────────────────────────────
 
-  function headerFillKey() {
-    return 'header_fill_' + window.location.pathname.split('/').pop().replace('.html', '');
-  }
-
-  function initHeaderFill() {
-    const h1 = document.querySelector('h1.heading-xl');
-    if (!h1) return;
-    const slug    = window.location.pathname.split('/').pop().replace('.html', '');
-    const titleCard = h1.closest('.page-top');
-    const backLink  = document.querySelector('.page-top .btn--text');
-    const savedFolderStyle = localStorage.getItem('header_folder_style_' + slug) || 'black';
-    if (backLink) backLink.classList.add('btn--text--' + savedFolderStyle);
-    const saved = localStorage.getItem(headerFillKey());
-    const savedTextColor = localStorage.getItem('header_text_color_' + slug);
-    if (saved) {
-      const opacity = parseInt(localStorage.getItem('header_opacity_' + slug) ?? '100', 10);
-      const r = parseInt(saved.slice(1,3), 16);
-      const g = parseInt(saved.slice(3,5), 16);
-      const b = parseInt(saved.slice(5,7), 16);
-      titleCard.style.backgroundColor = opacity < 100 ? `rgba(${r},${g},${b},${opacity/100})` : saved;
-      titleCard.style.borderColor = isDarkFill(saved) ? '#FFFFFF' : '#000000';
-      h1.style.color = savedTextColor || (isDarkFill(saved) ? '#FFFFFF' : '#000000');
-    } else if (savedTextColor) {
-      h1.style.color = savedTextColor;
-    }
-  }
 
 
   function initFolderLabel() {
@@ -2561,6 +2536,17 @@ const ContentBuilder = (() => {
     wrapper.prepend(icon);
   }
 
+  function initHeaderTextColor() {
+    const h1 = document.querySelector('h1.heading-xl');
+    if (!h1) return;
+    const slug = window.location.pathname.split('/').pop().replace('.html', '');
+    const saved = localStorage.getItem('header_text_color_' + slug);
+    if (!saved) return;
+    h1.style.color = saved;
+    const folderBtn = document.querySelector('.page-top .btn--text');
+    if (folderBtn) folderBtn.style.color = saved;
+  }
+
   function init() {
     createToolbar();
     initDither();
@@ -2568,7 +2554,7 @@ const ContentBuilder = (() => {
     initPageIcon();
     initDate();
     initVisibility();
-    initHeaderFill();
+    initHeaderTextColor();
     initFolderLabel();
     render();
   }

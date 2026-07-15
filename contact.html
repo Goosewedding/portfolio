@@ -35,5 +35,24 @@
   <script src="js/nav.js"></script>
   <script src="js/folders.js"></script>
   <script src="js/content-builder.js"></script>
+  <script>
+    window.addEventListener('load', function () {
+      function syncTextWidth() {
+        const imgWrap  = document.querySelector('#cb-content .cb-image-wrap');
+        const blocks   = document.querySelectorAll('#cb-content > .cb-block');
+        const textBlock = Array.from(blocks).find(b => !b.classList.contains('cb-block--image'));
+        if (!imgWrap || !textBlock) return;
+        const w = imgWrap.offsetWidth;
+        textBlock.style.width    = w + 'px';
+        textBlock.style.maxWidth = w + 'px';
+      }
+
+      syncTextWidth();
+      window.addEventListener('resize', syncTextWidth);
+
+      const imgWrap = document.querySelector('#cb-content .cb-image-wrap');
+      if (imgWrap) new ResizeObserver(syncTextWidth).observe(imgWrap);
+    });
+  </script>
 </body>
 </html>

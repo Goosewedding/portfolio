@@ -169,8 +169,17 @@ const Folders = (() => {
 
         const link = document.createElement('a');
         link.href = project.href;
-        link.className = 'btn--primary';
-        link.textContent = localStorage.getItem('title_' + slug) || project.label;
+        link.className = 'btn--text';
+        const title = localStorage.getItem('title_' + slug) || project.label;
+        const bullet = document.createElement('span');
+        bullet.textContent = '▪';
+        bullet.style.cssText = 'flex-shrink:0; margin-right:4px;';
+        const label = document.createElement('span');
+        label.textContent = title;
+        link.style.display = 'inline-flex';
+        link.style.alignItems = 'center';
+        link.appendChild(bullet);
+        link.appendChild(label);
 
         if (hidden && isAdmin) {
           link.style.opacity = '0.35';

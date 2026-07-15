@@ -672,8 +672,25 @@ ul, ol {
 .btn-icon-folder.is-open .icon--folder-open { display: inline-flex; align-items: center; }
 
 /* Sub-folder buttons use regular weight */
-.folder-contents .btn--primary {
-  font-weight: var(--weight-regular);
+
+.btn-icon-folder {
+  background-color: var(--color-gray-200);
+  color: #000000;
+}
+
+.btn-icon-folder:hover {
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
+.folder-contents .btn--text {
+  padding: 0 8px;
+}
+
+.folder-contents .btn--text:hover {
+  background-color: #000000;
+  color: #FFFFFF;
+  text-decoration: none;
 }
 
 /* Folder contents — hidden by default, shown when open */
@@ -1327,6 +1344,9 @@ ul, ol {
 
 .cb-text {
   outline: none;
+}
+
+.cb-text[contenteditable="true"] {
   min-height: 48px;
 }
 
@@ -1360,6 +1380,12 @@ ul, ol {
 @media (max-width: 640px) {
   #back-to-top {
     display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .cb-block--group {
+    padding: 16px;
   }
 }
 
