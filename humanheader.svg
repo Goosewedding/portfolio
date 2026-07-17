@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 523.1 28">
+  <!-- Generator: Adobe Illustrator 29.3.1, SVG Export Plug-In . SVG Version: 2.1.0 Build 151)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #fff;
+      }
+
+      .st1 {
+        fill: #231f20;
+        font-family: PPNeueBit-Bold, 'PP NeueBit';
+        font-size: 19px;
+        font-weight: 700;
+      }
+
+      .st2 {
+        display: none;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1" class="st2">
+    <g id="fCWlZN">
+      <image id="fCWlZN1" data-name="fCWlZN" width="523" height="28" transform="translate(0)" xlink:href="humanheader-1.png"/>
+    </g>
+  </g>
+  <g id="Layer_3">
+    <rect class="st0" x=".1" y="0" width="523" height="28"/>
+  </g>
+  <g id="Layer_2">
+    <rect x=".1" width="1" height="28"/>
+    <rect x=".1" width="523" height="1"/>
+    <rect x=".1" y="27" width="523" height="1"/>
+    <rect x="4.1" y="21" width="214" height="1"/>
+    <rect x="4.1" y="18" width="11" height="1"/>
+    <rect x="4.1" y="15" width="11" height="1"/>
+    <rect x="4.1" y="12" width="11" height="1"/>
+    <rect x="4.1" y="9" width="11" height="1"/>
+    <rect x="29.7" y="18" width="188.4" height="1"/>
+    <rect x="29.7" y="15" width="188.4" height="1"/>
+    <rect x="29.7" y="12" width="188.4" height="1"/>
+    <rect x="29.7" y="9" width="188.4" height="1"/>
+    <rect x="4.1" y="6" width="214" height="1"/>
+    <rect x="14.1" y="6" width="1" height="16"/>
+    <rect x="29.1" y="6" width="1" height="16"/>
+    <rect x="522.1" width="1" height="28"/>
+    <rect x="307.1" y="18" width="212" height="1"/>
+    <rect x="307.1" y="21" width="212" height="1"/>
+    <rect x="307.1" y="15" width="212" height="1"/>
+    <rect x="307.1" y="12" width="212" height="1"/>
+    <rect x="307.1" y="9" width="212" height="1"/>
+    <rect x="307.1" y="6" width="212" height="1"/>
+    <text class="st1" transform="translate(230.7 18.8)"><tspan x="0" y="0">Human.jpg</tspan></text>
+  </g>
+</svg>
