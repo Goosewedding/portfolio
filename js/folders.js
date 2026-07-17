@@ -11,8 +11,8 @@ const Folders = (() => {
     {
       label: 'UX Design',
       projects: [
-        { href: 'ux-project-01.html', label: 'Project 01' },
-        { href: 'ux-project-02.html', label: 'Project 02' },
+        { href: 'pi-student-dashboard.html', label: 'Project 01' },
+        { href: 'landing-page.html', label: 'Project 02' },
         { href: 'ux-project-03.html', label: 'Project 03' },
         { href: 'ux-project-04.html', label: 'Project 04' },
         { href: 'ux-project-05.html', label: 'Project 05' },
@@ -25,9 +25,9 @@ const Folders = (() => {
     {
       label: 'Motion Graphics',
       projects: [
-        { href: 'motion-project-01.html', label: 'Project 01' },
+        { href: 'e-learning-course-videos.html', label: 'Project 01' },
         { href: 'motion-project-02.html', label: 'Project 02' },
-        { href: 'motion-project-03.html', label: 'Project 03' },
+        { href: 'lyric-animations.html', label: 'Project 03' },
         { href: 'motion-project-04.html', label: 'Project 04' },
         { href: 'motion-project-05.html', label: 'Project 05' },
         { href: 'motion-project-06.html', label: 'Project 06' },
@@ -39,9 +39,9 @@ const Folders = (() => {
     {
       label: 'Graphic Design',
       projects: [
-        { href: 'graphic-project-01.html', label: 'Project 01' },
-        { href: 'graphic-project-02.html', label: 'Project 02' },
-        { href: 'graphic-project-03.html', label: 'Project 03' },
+        { href: 'typography.html', label: 'Project 01' },
+        { href: 'product-institute-graphic.html', label: 'Project 02' },
+        { href: 'puppet-rigs.html', label: 'Project 03' },
         { href: 'graphic-project-04.html', label: 'Project 04' },
         { href: 'graphic-project-05.html', label: 'Project 05' },
         { href: 'graphic-project-06.html', label: 'Project 06' },
@@ -62,12 +62,12 @@ const Folders = (() => {
     {
       label: 'Miscellaneous Projects',
       projects: [
-        { href: 'misc-project-01.html', label: 'Project 01' },
-        { href: 'misc-project-02.html', label: 'Project 02' },
-        { href: 'misc-project-03.html', label: 'Project 03' },
-        { href: 'misc-project-04.html', label: 'Project 04' },
-        { href: 'misc-project-05.html', label: 'Project 05' },
-        { href: 'misc-project-06.html', label: 'Project 06' },
+        { href: '3d-modeling.html', label: 'Project 01' },
+        { href: 'truck-camper.html', label: 'Project 02' },
+        { href: 'music.html', label: 'Project 03' },
+        { href: 'painting-and-illustration.html', label: 'Project 04' },
+        { href: 'vhs-short-films.html', label: 'Project 05' },
+        { href: 'buckys-fight-stick.html', label: 'Project 06' },
         { href: 'misc-project-07.html', label: 'Project 07' },
         { href: 'misc-project-08.html', label: 'Project 08' },
         { href: 'misc-project-09.html', label: 'Project 09' },
