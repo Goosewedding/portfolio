@@ -52,9 +52,9 @@
       }
 
       function syncWidths() {
-        const imgWrap = document.querySelector('#cb-content .cb-image-wrap');
-        if (!imgWrap) return;
-        const w = imgWrap.offsetWidth;
+        const imageBlock = document.querySelector('#cb-content .cb-block--image');
+        if (!imageBlock) return;
+        const w = imageBlock.offsetWidth;
         if (stack) stack.style.width = w + 'px';
         const textArea = document.getElementById('contact-text-area');
         if (textArea) { textArea.style.width = w + 'px'; textArea.style.maxWidth = w + 'px'; }
@@ -64,8 +64,8 @@
       syncWidths();
       window.addEventListener('resize', syncWidths);
 
-      const imgWrap = document.querySelector('#cb-content .cb-image-wrap');
-      if (imgWrap) new ResizeObserver(syncWidths).observe(imgWrap);
+      const imageBlock = document.querySelector('#cb-content .cb-block--image');
+      if (imageBlock) new ResizeObserver(syncWidths).observe(imageBlock);
     });
   </script>
 </body>
