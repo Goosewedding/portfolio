@@ -789,6 +789,42 @@ const ContentBuilder = (() => {
         });
         alignSection.appendChild(alignRow2);
         panel.appendChild(alignSection);
+
+        if (block.type === 'text') {
+          const leadSection = document.createElement('div');
+          const leadLabel = document.createElement('p');
+          leadLabel.className = 'label';
+          leadLabel.style.cssText = 'margin-bottom:var(--space-2); color:inherit;';
+          leadLabel.textContent = 'Leading';
+          leadSection.appendChild(leadLabel);
+
+          const leadRow = document.createElement('div');
+          leadRow.style.cssText = 'display:flex; align-items:center; gap:var(--space-2);';
+
+          const leadInput = document.createElement('input');
+          leadInput.type = 'number';
+          leadInput.min = '0.5';
+          leadInput.max = '4';
+          leadInput.step = '0.1';
+          leadInput.value = block.leading || '';
+          leadInput.placeholder = 'e.g. 1.5';
+          leadInput.style.cssText = 'width:80px; height:24px; padding:0 6px; border:1px solid currentColor; background:transparent; color:inherit; font-size:12px;';
+
+          const leadResetBtn = document.createElement('button');
+          leadResetBtn.className = 'btn--secondary';
+          leadResetBtn.textContent = 'Reset';
+          leadResetBtn.addEventListener('click', () => { leadInput.value = ''; setLeading(id, null); });
+
+          leadInput.addEventListener('change', () => {
+            const v = parseFloat(leadInput.value);
+            setLeading(id, isNaN(v) ? null : v);
+          });
+
+          leadRow.appendChild(leadInput);
+          leadRow.appendChild(leadResetBtn);
+          leadSection.appendChild(leadRow);
+          panel.appendChild(leadSection);
+        }
       }
 
       // Image-only controls
@@ -1279,6 +1315,17 @@ const ContentBuilder = (() => {
     render();
   }
 
+  function setLeading(id, val) {
+    const blocks = loadBlocks();
+    const b = findBlockInArray(blocks, id);
+    if (b) {
+      if (val === null) delete b.leading;
+      else b.leading = val;
+      saveBlocks(blocks);
+    }
+    render();
+  }
+
   function setVideoAspect(id, val) {
     const blocks = loadBlocks();
     const b = findBlockInArray(blocks, id);
@@ -1302,6 +1349,7 @@ const ContentBuilder = (() => {
     const el = document.createElement('div');
     el.className = 'cb-text';
     el.dataset.blockId = block.id;
+    if (block.leading) el.style.setProperty('--cb-leading', block.leading);
     if (block.content) {
       el.innerHTML = block.content;
     } else if (admin) {
@@ -1315,21 +1363,42 @@ const ContentBuilder = (() => {
       el.addEventListener('keydown', e => {
         if (e.key === 'Enter') {
           e.preventDefault();
+          const sel = window.getSelection();
+          if (!sel.rangeCount) return;
+          const cursorRange = sel.getRangeAt(0);
+          if (!cursorRange.collapsed) cursorRange.deleteContents();
+
           const para = getCurrentParagraph();
           const currentStyle = para
             ? (TYPE_CLASSES.find(c => para.classList.contains(c)) || 'body-base')
             : 'body-base';
           const newPara = document.createElement('div');
           newPara.className = currentStyle;
-          newPara.innerHTML = '<br>';
-          if (para) para.after(newPara);
-          else el.appendChild(newPara);
-          const range = document.createRange();
-          range.setStart(newPara, 0);
-          range.collapse(true);
-          const sel = window.getSelection();
+
+          if (para) {
+            // Extract everything from cursor to end of paragraph into the new para
+            const tailRange = document.createRange();
+            tailRange.setStart(cursorRange.startContainer, cursorRange.startOffset);
+            tailRange.setEnd(para, para.childNodes.length);
+            const tail = tailRange.extractContents();
+            newPara.appendChild(tail);
+            if (!newPara.textContent && !newPara.querySelector('br')) newPara.innerHTML = '<br>';
+            if (!para.textContent && !para.querySelector('br')) para.innerHTML = '<br>';
+            para.after(newPara);
+          } else {
+            newPara.innerHTML = '<br>';
+            el.appendChild(newPara);
+          }
+
+          const newRange = document.createRange();
+          newRange.setStart(newPara, 0);
+          newRange.collapse(true);
           sel.removeAllRanges();
-          sel.addRange(range);
+          sel.addRange(newRange);
+        }
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          document.execCommand('insertText', false, '  ');
         }
       });
       el.addEventListener('focus', () => showToolbar(el));

@@ -1246,7 +1246,7 @@ ul, ol {
 .cb-block {
   background-color: #ffffff;
   border: 1px solid #000000;
-  padding: var(--space-8);
+  padding: var(--space-4);
 }
 
 .cb-block--hug-top {
@@ -1344,6 +1344,9 @@ ul, ol {
 
 .cb-text {
   outline: none;
+}
+.cb-text > div {
+  line-height: var(--cb-leading, inherit);
 }
 
 .cb-text[contenteditable="true"] {
