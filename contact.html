@@ -28,7 +28,7 @@
     <h1 class="heading-xl" style="color:#000000;">Contact</h1>
   </div>
 
-  <div class="page-content page-content--wide">
+  <div class="page-content page-content--wide" style="display:flex; justify-content:center;">
     <div id="contact-image-stack" style="display:inline-flex; flex-direction:column;">
       <img id="contact-header-svg" src="humanheader.svg" alt="" style="width:100%; display:block; pointer-events:none;">
       <div id="cb-content"></div>
@@ -42,17 +42,22 @@
   <script src="js/content-builder.js"></script>
   <script>
     window.addEventListener('load', function () {
-      function syncWidths() {
-        const imgWrap   = document.querySelector('#cb-content .cb-image-wrap');
-        const stack     = document.getElementById('contact-image-stack');
-        const blocks    = document.querySelectorAll('#cb-content > .cb-block');
-        const textBlock = Array.from(blocks).find(b => !b.classList.contains('cb-block--image'));
-        if (!imgWrap) return;
-        const w = imgWrap.offsetWidth;
-        if (stack)     { stack.style.width = w + 'px'; }
-        if (textBlock) { textBlock.style.width = w + 'px'; textBlock.style.maxWidth = w + 'px'; }
+      const stack = document.getElementById('contact-image-stack');
+
+      // Move any text/non-image blocks out of the stack so they appear below the photo
+      function separateTextBlocks() {
+        const textBlocks = Array.from(document.querySelectorAll('#cb-content > .cb-block:not(.cb-block--image)'));
+        textBlocks.forEach(block => stack.parentNode.insertBefore(block, stack.nextSibling));
       }
 
+      function syncWidths() {
+        const imgWrap = document.querySelector('#cb-content .cb-image-wrap');
+        if (!imgWrap) return;
+        const w = imgWrap.offsetWidth;
+        if (stack) stack.style.width = w + 'px';
+      }
+
+      separateTextBlocks();
       syncWidths();
       window.addEventListener('resize', syncWidths);
 
