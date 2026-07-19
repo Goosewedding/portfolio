@@ -313,14 +313,14 @@ ul, ol {
 /* Headings — TT Mussels Trial */
 .heading-xl {
   font-family: var(--font-display);
-  font-size: var(--text-3xl);
+  font-size: 32px;
   font-weight: var(--weight-demibold);
   line-height: var(--leading-snug);
   letter-spacing: var(--tracking-tight);
 }
 
 @media (max-width: 640px) {
-  .heading-xl { font-size: var(--text-2xl); }
+  .heading-xl { font-size: 24px; }
 }
 
 .cb-spacer { height: var(--spacer-h, 32px); }
@@ -884,11 +884,17 @@ ul, ol {
 /* Top margin for project page headers */
 .page-top {
   margin-top: 48px;
+  margin-inline: clamp(8px, 10vw, 128px);
+  padding-inline: var(--space-4);
+  padding-block: var(--space-4);
+  box-shadow: inset 0 0 0 1px #000, inset 0 0 0 2px #fff, inset 0 0 0 3px #000;
 }
 
 @media (max-width: 640px) {
   .page-top {
     margin-top: 16px;
+    margin-inline: 8px;
+    padding-inline: var(--space-2);
   }
 }
 

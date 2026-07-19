@@ -1032,12 +1032,11 @@ const ContentBuilder = (() => {
 
     const nav = document.createElement('div');
     nav.id = 'cb-sections-nav';
-    nav.className = 'page-content page-content--wide';
     nav.style.cssText = 'margin-top:var(--space-4); display:flex; flex-direction:column; align-items:flex-start; gap:var(--space-1);';
 
     sections.forEach(b => {
       const link = document.createElement('button');
-      link.className = 'btn--primary';
+      link.className = 'btn--text';
       link.style.cssText = 'display:flex; align-items:center; gap:6px;';
 
       const icon = document.createElement('img');
@@ -1053,7 +1052,8 @@ const ContentBuilder = (() => {
       nav.appendChild(link);
     });
 
-    h1.parentElement.parentElement.insertAdjacentElement('afterend', nav);
+    const pageTop = document.querySelector('.page-top');
+    if (pageTop) pageTop.appendChild(nav);
   }
 
   function setSpacerHeight(id, height) {
@@ -2589,7 +2589,7 @@ const ContentBuilder = (() => {
     if (!h1) return;
 
     const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'display:flex; align-items:flex-start; gap:8px;';
+    wrapper.style.cssText = 'display:flow-root;';
     h1.parentElement.insertBefore(wrapper, h1);
     wrapper.appendChild(h1);
 
@@ -2601,7 +2601,7 @@ const ContentBuilder = (() => {
     icon.src = savedSrc;
     icon.alt = '';
     icon.className = 'cb-header-icon';
-    icon.style.cssText = 'height:' + getComputedStyle(h1).fontSize + '; width:auto; flex-shrink:0;';
+    icon.style.cssText = 'float:left; margin-right:8px; height:' + getComputedStyle(h1).lineHeight + '; width:auto;';
     wrapper.prepend(icon);
   }
 
