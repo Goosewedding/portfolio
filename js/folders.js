@@ -51,15 +51,6 @@ const Folders = (() => {
       ],
     },
     {
-      label: 'The Perpetual World',
-      projects: [
-        { href: 'perpetual-world-manifesto.html', label: 'The Perpetual World Manifesto' },
-        { href: 'perpetual-world-project-01.html', label: 'Project 01' },
-        { href: 'perpetual-world-project-02.html', label: 'Project 02' },
-        { href: 'perpetual-world-project-03.html', label: 'Project 03' },
-      ],
-    },
-    {
       label: 'Miscellaneous Projects',
       projects: [
         { href: '3d-modeling.html', label: 'Project 01' },
@@ -68,13 +59,14 @@ const Folders = (() => {
         { href: 'painting-and-illustration.html', label: 'Project 04' },
         { href: 'vhs-short-films.html', label: 'Project 05' },
         { href: 'buckys-fight-stick.html', label: 'Project 06' },
-        { href: 'misc-project-07.html', label: 'Project 07' },
-        { href: 'misc-project-08.html', label: 'Project 08' },
-        { href: 'misc-project-09.html', label: 'Project 09' },
-        { href: 'misc-project-10.html', label: 'Project 10' },
-        { href: 'misc-project-11.html', label: 'Project 11' },
-        { href: 'misc-project-12.html', label: 'Project 12' },
-        { href: 'misc-project-13.html', label: 'Project 13' },
+        { href: 'perpetual-world-manifesto.html', label: 'Project 07' },
+        { href: 'misc-project-07.html', label: 'Project 08' },
+        { href: 'misc-project-08.html', label: 'Project 09' },
+        { href: 'misc-project-09.html', label: 'Project 10' },
+        { href: 'misc-project-10.html', label: 'Project 11' },
+        { href: 'misc-project-11.html', label: 'Project 12' },
+        { href: 'misc-project-12.html', label: 'Project 13' },
+        { href: 'misc-project-13.html', label: 'Project 14' },
       ],
     },
   ];

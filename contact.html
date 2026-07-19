@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <div id="contact-text-below" style="margin-left:auto; margin-right:auto;"></div>
+  <div id="contact-text-below" style="margin-left:auto; margin-right:auto; margin-bottom:64px;"></div>
 
   <script src="js/published-data.js"></script>
   <script src="js/auth.js"></script>
@@ -74,11 +74,11 @@
         const target = Array.from(textBelow.querySelectorAll('.cb-block')).find(b => b.textContent.includes('spammer'));
         if (!target) return;
         const btn = document.createElement('button');
-        btn.className = 'btn--primary';
-        btn.style.cssText = 'margin-top:var(--space-4); display:block;';
+        btn.className = 'btn--secondary';
+        btn.style.cssText = 'margin-top:var(--space-4); display:block; background-color:var(--color-gray-200);';
         btn.textContent = 'Phone Number';
-        btn.addEventListener('mouseenter', () => { btn.textContent = '515-494-2772'; });
-        btn.addEventListener('mouseleave', () => { btn.textContent = 'Phone Number'; });
+        btn.addEventListener('mouseenter', () => { btn.textContent = '515-494-2772'; btn.style.backgroundColor = '#000000'; btn.style.color = '#ffffff'; });
+        btn.addEventListener('mouseleave', () => { btn.textContent = 'Phone Number'; btn.style.backgroundColor = 'var(--color-gray-200)'; btn.style.color = ''; });
         target.appendChild(btn);
       }
 
