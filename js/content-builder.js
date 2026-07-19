@@ -6,6 +6,9 @@ const ContentBuilder = (() => {
 
   const SESSION_KEY = 'portfolio_auth';
 
+  const SVG_FOLDER_OPEN   = `<svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.0408 1V2.66667H1.95918L0 10.3333V2.66667V0H3.59184L4.57143 1H14.0408Z" fill="currentColor"/><path d="M14.2041 12H0.489796L2.44898 3.5H16L14.2041 12Z" fill="currentColor"/></svg>`;
+  const SVG_FOLDER_CLOSED = `<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 12H0V0H3.5814L4.55814 1H14V12Z" fill="currentColor"/></svg>`;
+
   // ── Add new images here when you drop them in the folder ──
   const IMAGES = [
     'images/page%20builder%20images/alone%20in%20the%20store%20am%20I%20dreaming.png',
@@ -266,6 +269,7 @@ const ContentBuilder = (() => {
 
     if (admin) container.appendChild(renderAddBar());
     renderSectionsList();
+    renderSidebarContent();
   }
 
   function renderBlock(block, index, total, admin, nextBlock) {
@@ -1020,40 +1024,8 @@ const ContentBuilder = (() => {
   }
 
   function renderSectionsList() {
-    const h1 = document.querySelector('h1.heading-xl');
-    if (!h1) return;
-
     const existing = document.getElementById('cb-sections-nav');
     if (existing) existing.remove();
-
-    const blocks = loadBlocks();
-    const sections = blocks.filter(b => b.type === 'section' && b.sectionTitle);
-    if (sections.length < 2) return;
-
-    const nav = document.createElement('div');
-    nav.id = 'cb-sections-nav';
-    nav.style.cssText = 'margin-top:var(--space-4); display:flex; flex-direction:column; align-items:flex-start; gap:var(--space-1);';
-
-    sections.forEach(b => {
-      const link = document.createElement('button');
-      link.className = 'btn--text';
-      link.style.cssText = 'display:flex; align-items:center; gap:6px;';
-
-      const icon = document.createElement('img');
-      icon.src = 'icons/page.svg';
-      icon.style.cssText = 'width:auto; height:1em; flex-shrink:0;';
-      link.appendChild(icon);
-      link.appendChild(document.createTextNode(b.sectionTitle));
-
-      link.addEventListener('click', () => {
-        const target = document.getElementById('cb-section-' + b.id);
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
-      });
-      nav.appendChild(link);
-    });
-
-    const pageTop = document.querySelector('.page-top');
-    if (pageTop) pageTop.appendChild(nav);
   }
 
   function setSpacerHeight(id, height) {
@@ -2601,7 +2573,7 @@ const ContentBuilder = (() => {
     icon.src = savedSrc;
     icon.alt = '';
     icon.className = 'cb-header-icon';
-    icon.style.cssText = 'float:left; margin-right:8px; height:' + getComputedStyle(h1).lineHeight + '; width:auto;';
+    icon.style.cssText = 'float:left; margin-right:8px; height:48px; width:auto;';
     wrapper.prepend(icon);
   }
 
@@ -2616,7 +2588,101 @@ const ContentBuilder = (() => {
     if (folderBtn) folderBtn.style.color = saved;
   }
 
+  function renderSidebarContent() {
+    const sidebar = document.querySelector('.page-sidebar');
+    if (!sidebar) return;
+
+    const prev = sidebar.querySelector('.sidebar-inner');
+    if (prev) prev.remove();
+
+    const filename = window.location.pathname.split('/').pop() || 'index.html';
+    const slug = filename.replace('.html', '');
+
+    const folderLabel = typeof Folders !== 'undefined' ? Folders.getProjectFolder(filename) : null;
+    if (!folderLabel) return;
+
+    const folderName = Folders.getDisplayName(folderLabel);
+    const pageTitle  = localStorage.getItem('title_' + slug) ||
+                       document.querySelector('h1.heading-xl')?.textContent?.trim() || slug;
+
+    const blocks   = loadBlocks();
+    const sections = blocks.filter(b => b.type === 'section' && b.sectionTitle);
+
+    const inner = document.createElement('div');
+    inner.className = 'sidebar-inner';
+
+    // Folder row
+    const folderRow = document.createElement('button');
+    folderRow.className = 'sidebar-row sidebar-row--folder';
+
+    const iconOpen = document.createElement('span');
+    iconOpen.className = 'sidebar-icon sidebar-icon--open';
+    iconOpen.innerHTML = SVG_FOLDER_OPEN;
+
+    const iconClosed = document.createElement('span');
+    iconClosed.className = 'sidebar-icon sidebar-icon--closed';
+    iconClosed.innerHTML = SVG_FOLDER_CLOSED;
+
+    folderRow.appendChild(iconOpen);
+    folderRow.appendChild(iconClosed);
+    folderRow.appendChild(document.createTextNode(folderName));
+    folderRow.addEventListener('click', () => { window.location.href = 'portfolio.html'; });
+    inner.appendChild(folderRow);
+
+    // Current project row
+    const projectRow = document.createElement('div');
+    projectRow.className = 'sidebar-row sidebar-row--project';
+    projectRow.textContent = pageTitle;
+    inner.appendChild(projectRow);
+
+    // Section rows
+    sections.forEach(b => {
+      const btn = document.createElement('button');
+      btn.className = 'sidebar-row sidebar-row--section';
+      const icon = document.createElement('img');
+      icon.src = 'icons/page.svg';
+      icon.style.cssText = 'width:auto; height:1em; flex-shrink:0;';
+      btn.appendChild(icon);
+      btn.appendChild(document.createTextNode(b.sectionTitle));
+      btn.addEventListener('click', () => {
+        const target = document.getElementById('cb-section-' + b.id);
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+      inner.appendChild(btn);
+    });
+
+    sidebar.appendChild(inner);
+  }
+
+  function initSidebar() {
+    if (document.querySelector('.page-layout')) return;
+    const nav = document.querySelector('nav.site-nav');
+    if (!nav) return;
+
+    const filename = window.location.pathname.split('/').pop() || 'index.html';
+    if (typeof Folders === 'undefined' || !Folders.getProjectFolder(filename)) return;
+
+    const layout = document.createElement('div');
+    layout.className = 'page-layout';
+
+    const sidebar = document.createElement('aside');
+    sidebar.className = 'page-sidebar';
+
+    const main = document.createElement('div');
+    main.className = 'page-main';
+
+    const toMove = [];
+    let sibling = nav.nextSibling;
+    while (sibling) { toMove.push(sibling); sibling = sibling.nextSibling; }
+    toMove.forEach(el => main.appendChild(el));
+
+    layout.appendChild(sidebar);
+    layout.appendChild(main);
+    nav.insertAdjacentElement('afterend', layout);
+  }
+
   function init() {
+    initSidebar();
     createToolbar();
     initDither();
     initTitle();
