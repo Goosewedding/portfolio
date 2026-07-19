@@ -8,6 +8,9 @@
   <style>
     #contact-image-stack #cb-content { margin-top: 0; }
     #contact-image-stack #cb-content > .cb-block:first-child { margin-top: 0; padding-top: 0; }
+    #contact-image-stack { outline: 1px solid #ffffff; }
+    #contact-text-below .cb-block { padding: var(--space-4); }
+    #contact-text-below { margin-top: var(--space-8); display: flex; flex-direction: column; gap: var(--space-4); }
   </style>
 </head>
 <body>
@@ -32,13 +35,14 @@
     <h1 class="heading-xl" style="color:#000000;">Contact</h1>
   </div>
 
-  <div class="page-content page-content--wide" style="display:flex; justify-content:center;">
+  <div class="page-content page-content--wide" style="display:flex; justify-content:center; margin-top:var(--space-4);">
     <div id="contact-image-stack" style="display:inline-flex; flex-direction:column;">
       <img id="contact-header-svg" src="humanheader.svg" alt="" style="width:100%; display:block; pointer-events:none;">
       <div id="cb-content"></div>
     </div>
   </div>
-  <div id="contact-text-area" style="margin-left:auto; margin-right:auto;"></div>
+
+  <div id="contact-text-below" style="margin-left:auto; margin-right:auto;"></div>
 
   <script src="js/published-data.js"></script>
   <script src="js/auth.js"></script>
@@ -50,9 +54,9 @@
       const stack = document.getElementById('contact-image-stack');
 
       function separateTextBlocks() {
-        const textArea = document.getElementById('contact-text-area');
+        const textBelow = document.getElementById('contact-text-below');
         const textBlocks = Array.from(document.querySelectorAll('#cb-content > .cb-block:not(.cb-block--image)'));
-        textBlocks.forEach(block => textArea.appendChild(block));
+        textBlocks.forEach(block => textBelow.appendChild(block));
       }
 
       function syncWidths() {
@@ -60,11 +64,26 @@
         if (!imageBlock) return;
         const w = imageBlock.offsetWidth;
         if (stack) stack.style.width = w + 'px';
-        const textArea = document.getElementById('contact-text-area');
-        if (textArea) { textArea.style.width = w + 'px'; textArea.style.maxWidth = w + 'px'; }
+        const textBelow = document.getElementById('contact-text-below');
+        if (textBelow) { textBelow.style.width = w + 'px'; textBelow.style.maxWidth = w + 'px'; }
+      }
+
+      function addPhoneReveal() {
+        const textBelow = document.getElementById('contact-text-below');
+        if (!textBelow) return;
+        const target = Array.from(textBelow.querySelectorAll('.cb-block')).find(b => b.textContent.includes('spammer'));
+        if (!target) return;
+        const btn = document.createElement('button');
+        btn.className = 'btn--primary';
+        btn.style.cssText = 'margin-top:var(--space-4); display:block;';
+        btn.textContent = 'Phone Number';
+        btn.addEventListener('mouseenter', () => { btn.textContent = '515-494-2772'; });
+        btn.addEventListener('mouseleave', () => { btn.textContent = 'Phone Number'; });
+        target.appendChild(btn);
       }
 
       separateTextBlocks();
+      addPhoneReveal();
       syncWidths();
       window.addEventListener('resize', syncWidths);
 
