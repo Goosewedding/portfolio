@@ -34,6 +34,7 @@
       <div id="cb-content"></div>
     </div>
   </div>
+  <div id="contact-text-area" class="page-content page-content--wide"></div>
 
   <script src="js/published-data.js"></script>
   <script src="js/auth.js"></script>
@@ -44,10 +45,10 @@
     window.addEventListener('load', function () {
       const stack = document.getElementById('contact-image-stack');
 
-      // Move any text/non-image blocks out of the stack so they appear below the photo
       function separateTextBlocks() {
+        const textArea = document.getElementById('contact-text-area');
         const textBlocks = Array.from(document.querySelectorAll('#cb-content > .cb-block:not(.cb-block--image)'));
-        textBlocks.forEach(block => stack.parentNode.insertBefore(block, stack.nextSibling));
+        textBlocks.forEach(block => textArea.appendChild(block));
       }
 
       function syncWidths() {
