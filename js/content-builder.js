@@ -2574,7 +2574,7 @@ const ContentBuilder = (() => {
     icon.src = savedSrc;
     icon.alt = '';
     icon.className = 'cb-header-icon';
-    icon.style.cssText = 'float:left; margin-right:8px; height:48px; width:auto;';
+    icon.style.cssText = 'float:left; margin-right:8px; width:auto;';
     wrapper.prepend(icon);
   }
 
@@ -2609,31 +2609,43 @@ const ContentBuilder = (() => {
     const blocks   = loadBlocks();
     const sections = blocks.filter(b => b.type === 'section' && b.sectionTitle);
 
+    // Header bar
+    const header = document.createElement('button');
+    header.className = 'sidebar-header';
+    header.addEventListener('click', () => {
+      const wasCollapsed = sidebar.classList.contains('is-collapsed');
+      sidebar.classList.toggle('is-collapsed');
+      if (wasCollapsed) {
+        document.getElementById('folder-sound')?.play().catch(() => {});
+      } else {
+        document.getElementById('folder-close-sound')?.play().catch(() => {});
+      }
+    });
+
+    const headerImgOpen = document.createElement('img');
+    headerImgOpen.src = 'icons/TitlebarChrome.svg';
+    headerImgOpen.className = 'sidebar-header__chrome sidebar-header__chrome--open';
+
+    const headerImgClosed = document.createElement('img');
+    headerImgClosed.src = 'icons/TitlebarClosed.svg';
+    headerImgClosed.className = 'sidebar-header__chrome sidebar-header__chrome--closed';
+
+    header.appendChild(headerImgOpen);
+    header.appendChild(headerImgClosed);
+    sidebar.appendChild(header);
+
     const inner = document.createElement('div');
     inner.className = 'sidebar-inner';
-
-    // Folder row
-    const folderRow = document.createElement('button');
-    folderRow.className = 'sidebar-row sidebar-row--folder';
-
-    const iconOpen = document.createElement('span');
-    iconOpen.className = 'sidebar-icon sidebar-icon--open';
-    iconOpen.innerHTML = SVG_FOLDER_OPEN;
-
-    const iconClosed = document.createElement('span');
-    iconClosed.className = 'sidebar-icon sidebar-icon--closed';
-    iconClosed.innerHTML = SVG_FOLDER_CLOSED;
-
-    folderRow.appendChild(iconOpen);
-    folderRow.appendChild(iconClosed);
-    folderRow.appendChild(document.createTextNode(folderName));
-    folderRow.addEventListener('click', () => { window.location.href = 'portfolio.html'; });
-    inner.appendChild(folderRow);
 
     // Current project row
     const projectRow = document.createElement('div');
     projectRow.className = 'sidebar-row sidebar-row--project';
-    projectRow.textContent = pageTitle;
+
+    const projIcon = document.createElement('span');
+    projIcon.className = 'sidebar-icon sidebar-icon--open';
+    projIcon.innerHTML = SVG_FOLDER_OPEN;
+    projectRow.appendChild(projIcon);
+    projectRow.appendChild(document.createTextNode(pageTitle));
     inner.appendChild(projectRow);
 
     // Section rows
