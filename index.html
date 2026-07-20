@@ -18,19 +18,8 @@
       display: flex;
       flex-direction: column;
     }
-    @keyframes fade-in {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    html.first-launch body {
-      opacity: 0;
-      animation: fade-in 0.5s ease forwards;
-    }
   </style>
   <script>
-    if (!localStorage.getItem('startup_played')) {
-      document.documentElement.classList.add('first-launch');
-    }
     (function() {
       var bgs = [
         'backgrounds/background.gif',
@@ -95,34 +84,12 @@
   </div>
 
 
-  <audio id="startup-sound" src="startup.m4a" preload="auto"></audio>
   <audio id="folder-sound" src="folderopen.mp3" preload="auto"></audio>
 
   <script src="js/published-data.js"></script>
   <script src="js/nav.js"></script>
   <script src="js/folders.js"></script>
   <script>
-    (function () {
-      if (localStorage.getItem('startup_played')) return;
-
-      const audio = document.getElementById('startup-sound');
-
-      function playStartup() {
-        audio.play().then(() => {
-          localStorage.setItem('startup_played', '1');
-        }).catch(() => {});
-        document.removeEventListener('click', playStartup);
-        document.removeEventListener('keydown', playStartup);
-      }
-
-      // Try autoplay immediately; if browser blocks it, wait for first interaction
-      audio.play().then(() => {
-        localStorage.setItem('startup_played', '1');
-      }).catch(() => {
-        document.addEventListener('click', playStartup);
-        document.addEventListener('keydown', playStartup);
-      });
-    })();
 
     Folders.render(document.getElementById('folder-list'));
 
