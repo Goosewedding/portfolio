@@ -4,14 +4,11 @@
   <defs>
     <style>
       .st0 {
-        fill: #fff;
+        fill: #231f20;
       }
 
       .st1 {
-        fill: #231f20;
-        font-family: PPNeueBit-Bold, 'PP NeueBit';
-        font-size: 19px;
-        font-weight: 700;
+        fill: #fff;
       }
 
       .st2 {
@@ -25,7 +22,7 @@
     </g>
   </g>
   <g id="Layer_3">
-    <rect class="st0" x=".1" y="0" width="523" height="28"/>
+    <rect class="st1" x=".1" y="0" width="523" height="28"/>
   </g>
   <g id="Layer_2">
     <rect x=".1" width="1" height="28"/>
@@ -50,6 +47,16 @@
     <rect x="307.1" y="12" width="212" height="1"/>
     <rect x="307.1" y="9" width="212" height="1"/>
     <rect x="307.1" y="6" width="212" height="1"/>
-    <text class="st1" transform="translate(230.7 18.8)"><tspan x="0" y="0">Human.jpg</tspan></text>
+    <g>
+      <path class="st0" d="M232.8,18.8h-1.4v-9.5h1.4v3.7h4.8v-3.7h1.4v9.5h-1.4v-4.4h-4.8v4.4Z"/>
+      <path class="st0" d="M243.9,18.8h-2.4v-.7h-.7v-.7h-.7v-5.4h1.4v4.8h.7v.7h1.7v-.7h.7v-4.8h1.4v6.8h-1.4v-.7h-.7v.7Z"/>
+      <path class="st0" d="M248.7,18.8h-1.4v-6.8h1.4v.7h.7v-.7h2v.7h1.4v-.7h2.7v.7h.7v.7h.7v5.4h-1.4v-4.8h-.7v-.7h-1.4v.7h-.7v4.8h-1.4v-4.8h-.7v-.7h-1.4v.7h-.7v4.8Z"/>
+      <path class="st0" d="M262.3,18.8h-2.7v-.7h-.7v-.7h-.7v-1.4h.7v-.7h1.4v-.7h2.7v-.7h-.7v-.7h-2v.7h-2v-.7h.7v-.7h.7v-.7h3.4v.7h.7v.7h.7v5.4h-1.4v-.7h-.7v.7ZM259.9,17.4h2.4v-.7h.7v-1.4h-.7v.7h-2.4v1.4Z"/>
+      <path class="st0" d="M267,18.8h-1.4v-6.8h1.4v.7h.7v-.7h2.4v.7h.7v.7h.7v5.4h-1.4v-4.8h-.7v-.7h-1.7v.7h-.7v4.8Z"/>
+      <path class="st0" d="M274.1,18.8h-1.4v-1.4h1.4v1.4Z"/>
+      <path class="st0" d="M276.2,21.5h-2v-1.4h1.4v-8.1h1.4v8.8h-.7v.7ZM276.8,11h-1.4v-1.4h1.4v1.4Z"/>
+      <path class="st0" d="M279.5,21.5h-1.4v-9.5h1.4v.7h.7v-.7h2.7v.7h.7v.7h.7v4.1h-.7v.7h-.7v.7h-2.7v-.7h-.7v3.4ZM280.2,17.4h2v-.7h.7v-2.7h-.7v-.7h-2v.7h-.7v2.7h.7v.7Z"/>
+      <path class="st0" d="M290.4,21.5h-3.4v-.7h-.7v-.7h-.7v-.7h2v.7h2v-.7h.7v-1.4h-.7v.7h-2.7v-.7h-.7v-.7h-.7v-4.1h.7v-.7h.7v-.7h2.7v.7h.7v-.7h1.4v8.1h-.7v.7h-.7v.7ZM287.7,17.4h2v-.7h.7v-2.7h-.7v-.7h-2v.7h-.7v2.7h.7v.7Z"/>
+    </g>
   </g>
 </svg>

@@ -270,6 +270,7 @@ const ContentBuilder = (() => {
     if (admin) container.appendChild(renderAddBar());
     renderSectionsList();
     renderSidebarContent();
+    initScrollSpy();
   }
 
   function renderBlock(block, index, total, admin, nextBlock) {
@@ -2639,6 +2640,7 @@ const ContentBuilder = (() => {
     sections.forEach(b => {
       const btn = document.createElement('button');
       btn.className = 'sidebar-row sidebar-row--section';
+      btn.dataset.sectionId = b.id;
       const icon = document.createElement('img');
       icon.src = 'icons/page.svg';
       icon.style.cssText = 'width:auto; height:1em; flex-shrink:0;';
@@ -2646,12 +2648,53 @@ const ContentBuilder = (() => {
       btn.appendChild(document.createTextNode(b.sectionTitle));
       btn.addEventListener('click', () => {
         const target = document.getElementById('cb-section-' + b.id);
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
+        if (target) {
+          const top = target.getBoundingClientRect().top + window.scrollY - 32;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
       });
       inner.appendChild(btn);
     });
 
     sidebar.appendChild(inner);
+  }
+
+  let _scrollSpyCleanup = null;
+
+  function initScrollSpy() {
+    if (_scrollSpyCleanup) { _scrollSpyCleanup(); _scrollSpyCleanup = null; }
+
+    const sidebar = document.querySelector('.page-sidebar');
+    if (!sidebar) return;
+
+    const buttons = Array.from(sidebar.querySelectorAll('.sidebar-row--section[data-section-id]'));
+    if (!buttons.length) return;
+
+    const sectionEls = buttons.map(btn =>
+      document.getElementById('cb-section-' + btn.dataset.sectionId)
+    ).filter(Boolean);
+    if (!sectionEls.length) return;
+
+    function getActive() {
+      const threshold = window.scrollY + window.innerHeight * 0.35;
+      let active = sectionEls[0];
+      for (const el of sectionEls) {
+        if (el.getBoundingClientRect().top + window.scrollY <= threshold) active = el;
+      }
+      return active;
+    }
+
+    function update() {
+      const active = getActive();
+      buttons.forEach(btn => {
+        const el = document.getElementById('cb-section-' + btn.dataset.sectionId);
+        btn.classList.toggle('is-active', el === active);
+      });
+    }
+
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+    _scrollSpyCleanup = () => window.removeEventListener('scroll', update);
   }
 
   function initSidebar() {

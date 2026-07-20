@@ -998,6 +998,11 @@ ul, ol {
   background-color: var(--color-gray-200);
 }
 
+.sidebar-row--section.is-active {
+  background-color: #000;
+  color: #fff;
+}
+
 .page-main {
   margin-left: calc(8px + 320px + 16px);
 }

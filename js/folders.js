@@ -278,7 +278,8 @@ const Folders = (() => {
     });
 
     // Folder open/close toggle — plays sound if the page has one
-    const folderSound = document.getElementById('folder-sound');
+    const folderSound      = document.getElementById('folder-sound');
+    const folderCloseSound = document.getElementById('folder-close-sound');
     container.querySelectorAll('.btn-icon-folder').forEach(btn => {
       btn.addEventListener('click', () => {
         const isOpen = btn.classList.toggle('is-open');
@@ -287,6 +288,9 @@ const Folders = (() => {
         if (isOpen && folderSound) {
           folderSound.currentTime = 0;
           folderSound.play().catch(() => {});
+        } else if (!isOpen && folderCloseSound) {
+          folderCloseSound.currentTime = 0;
+          folderCloseSound.play().catch(() => {});
         }
       });
     });
