@@ -9,6 +9,13 @@ const ContentBuilder = (() => {
   const SVG_FOLDER_OPEN   = `<svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.0408 1V2.66667H1.95918L0 10.3333V2.66667V0H3.59184L4.57143 1H14.0408Z" fill="currentColor"/><path d="M14.2041 12H0.489796L2.44898 3.5H16L14.2041 12Z" fill="currentColor"/></svg>`;
   const SVG_FOLDER_CLOSED = `<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 12H0V0H3.5814L4.55814 1H14V12Z" fill="currentColor"/></svg>`;
 
+  const _audio = {};
+  function playSound(src) {
+    if (!_audio[src]) _audio[src] = new Audio(src);
+    _audio[src].currentTime = 0;
+    _audio[src].play().catch(() => {});
+  }
+
   // ── Add new images here when you drop them in the folder ──
   const IMAGES = [
     'images/page%20builder%20images/alone%20in%20the%20store%20am%20I%20dreaming.png',
@@ -2616,9 +2623,9 @@ const ContentBuilder = (() => {
       const wasCollapsed = sidebar.classList.contains('is-collapsed');
       sidebar.classList.toggle('is-collapsed');
       if (wasCollapsed) {
-        document.getElementById('folder-sound')?.play().catch(() => {});
+        playSound('folderopen.mp3');
       } else {
-        document.getElementById('folder-close-sound')?.play().catch(() => {});
+        playSound('folderclose.mp3');
       }
     });
 
@@ -2626,27 +2633,31 @@ const ContentBuilder = (() => {
     headerImgOpen.src = 'icons/TitlebarChrome.svg';
     headerImgOpen.className = 'sidebar-header__chrome sidebar-header__chrome--open';
 
+    const headerImgOpenHover = document.createElement('img');
+    headerImgOpenHover.src = 'icons/TitlebarHover.svg';
+    headerImgOpenHover.className = 'sidebar-header__chrome sidebar-header__chrome--open-hover';
+
     const headerImgClosed = document.createElement('img');
     headerImgClosed.src = 'icons/TitlebarClosed.svg';
     headerImgClosed.className = 'sidebar-header__chrome sidebar-header__chrome--closed';
 
+    const headerImgClosedHover = document.createElement('img');
+    headerImgClosedHover.src = 'icons/TitlebarClosedHover.svg';
+    headerImgClosedHover.className = 'sidebar-header__chrome sidebar-header__chrome--closed-hover';
+
+    const headerLabel = document.createElement('span');
+    headerLabel.className = 'sidebar-header__label';
+    headerLabel.textContent = pageTitle;
+
     header.appendChild(headerImgOpen);
+    header.appendChild(headerImgOpenHover);
     header.appendChild(headerImgClosed);
+    header.appendChild(headerImgClosedHover);
+    header.appendChild(headerLabel);
     sidebar.appendChild(header);
 
     const inner = document.createElement('div');
     inner.className = 'sidebar-inner';
-
-    // Current project row
-    const projectRow = document.createElement('div');
-    projectRow.className = 'sidebar-row sidebar-row--project';
-
-    const projIcon = document.createElement('span');
-    projIcon.className = 'sidebar-icon sidebar-icon--open';
-    projIcon.innerHTML = SVG_FOLDER_OPEN;
-    projectRow.appendChild(projIcon);
-    projectRow.appendChild(document.createTextNode(pageTitle));
-    inner.appendChild(projectRow);
 
     // Section rows
     sections.forEach(b => {
