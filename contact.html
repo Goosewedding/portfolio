@@ -9,6 +9,8 @@
     #contact-image-stack #cb-content { margin-top: 0; }
     #contact-image-stack #cb-content > .cb-block:first-child { margin-top: 0; padding-top: 0; }
     #contact-image-stack { outline: 1px solid #ffffff; }
+    #contact-text-above .cb-block { padding: var(--space-4); }
+    #contact-text-above { margin-bottom: var(--space-4); display: flex; flex-direction: column; gap: var(--space-4); }
     #contact-text-below .cb-block { padding: var(--space-4); }
     #contact-text-below { margin-top: var(--space-8); display: flex; flex-direction: column; gap: var(--space-4); }
   </style>
@@ -36,9 +38,12 @@
   </div>
 
   <div class="page-content page-content--wide" style="display:flex; justify-content:center; margin-top:var(--space-4);">
-    <div id="contact-image-stack" style="display:inline-flex; flex-direction:column;">
-      <img id="contact-header-svg" src="humanheader.svg" alt="" style="width:100%; display:block; pointer-events:none;">
-      <div id="cb-content"></div>
+    <div style="display:inline-flex; flex-direction:column; width:100%;" id="contact-center-col">
+      <div id="contact-text-above" style="margin-left:auto; margin-right:auto;"></div>
+      <div id="contact-image-stack" style="display:inline-flex; flex-direction:column; margin-left:auto; margin-right:auto;">
+        <img id="contact-header-svg" src="humanheader.svg" alt="" style="width:100%; display:block; pointer-events:none;">
+        <div id="cb-content"></div>
+      </div>
     </div>
   </div>
 
@@ -64,14 +69,14 @@
         if (!imageBlock) return;
         const w = imageBlock.offsetWidth;
         if (stack) stack.style.width = w + 'px';
+        const textAbove = document.getElementById('contact-text-above');
+        if (textAbove) { textAbove.style.width = w + 'px'; textAbove.style.maxWidth = w + 'px'; }
         const textBelow = document.getElementById('contact-text-below');
         if (textBelow) { textBelow.style.width = w + 'px'; textBelow.style.maxWidth = w + 'px'; }
       }
 
       function addPhoneReveal() {
-        const textBelow = document.getElementById('contact-text-below');
-        if (!textBelow) return;
-        const target = Array.from(textBelow.querySelectorAll('.cb-block')).find(b => b.textContent.includes('spammer'));
+        const target = Array.from(document.querySelectorAll('.cb-block')).find(b => b.textContent.includes('spammer'));
         if (!target) return;
         const btn = document.createElement('button');
         btn.className = 'btn--secondary';
@@ -83,6 +88,14 @@
       }
 
       separateTextBlocks();
+
+      // Move spammer block above the image stack
+      const textBelow = document.getElementById('contact-text-below');
+      const spammerBlock = Array.from(textBelow.querySelectorAll('.cb-block')).find(b => b.textContent.includes('spammer'));
+      if (spammerBlock) {
+        document.getElementById('contact-text-above').appendChild(spammerBlock);
+      }
+
       addPhoneReveal();
       syncWidths();
       window.addEventListener('resize', syncWidths);
