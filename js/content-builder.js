@@ -32,14 +32,16 @@ const ContentBuilder = (() => {
     { label: 'H LG',       value: 'heading-lg'  },
     { label: 'H MD',       value: 'heading-md'  },
     { label: 'H SM',       value: 'heading-sm'  },
-    { label: 'Body LG',    value: 'body-lg'     },
     { label: 'Body',       value: 'body-base'   },
-    { label: 'Body SM',    value: 'body-sm'     },
     { label: 'Label',      value: 'label'       },
     { label: 'Caption',    value: 'caption'     },
   ];
 
   const TYPE_CLASSES = TEXT_STYLES.map(s => s.value);
+
+  // Retired style classes — no longer selectable, but still stripped when a
+  // new style is applied so old content doesn't end up with two classes fighting in CSS.
+  const LEGACY_TYPE_CLASSES = ['body-lg', 'body-sm'];
 
   const COLORS = [
     { label: 'White',    value: '#FFFFFF', dark: false },
@@ -183,6 +185,7 @@ const ContentBuilder = (() => {
     const para = getCurrentParagraph();
     if (!para) return;
     TYPE_CLASSES.forEach(c => para.classList.remove(c));
+    LEGACY_TYPE_CLASSES.forEach(c => para.classList.remove(c));
     para.classList.add(styleValue);
     // Save
     saveCurrentTextBlock();
@@ -1325,6 +1328,16 @@ const ContentBuilder = (() => {
 
   // ── Group block ───────────────────────────────────────────
 
+  function stripFontSize(html) {
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    container.querySelectorAll('[style*="font-size"]').forEach(node => {
+      node.style.removeProperty('font-size');
+      if (!node.getAttribute('style')) node.removeAttribute('style');
+    });
+    return container.innerHTML;
+  }
+
   function buildTextEl(block, admin) {
     const el = document.createElement('div');
     el.className = 'cb-text';
@@ -1379,6 +1392,15 @@ const ContentBuilder = (() => {
         if (e.key === 'Tab') {
           e.preventDefault();
           document.execCommand('insertText', false, '  ');
+        }
+      });
+      el.addEventListener('paste', e => {
+        e.preventDefault();
+        const html = e.clipboardData.getData('text/html');
+        if (html) {
+          document.execCommand('insertHTML', false, stripFontSize(html));
+        } else {
+          document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
         }
       });
       el.addEventListener('focus', () => showToolbar(el));

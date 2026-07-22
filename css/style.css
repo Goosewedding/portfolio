@@ -381,9 +381,13 @@ ul, ol {
   line-height: var(--leading-normal);
 }
 
+@media (max-width: 1660px) {
+  .body-base { font-size: 16pt; }
+}
+
 @media (max-width: 640px) {
   .body-lg   { font-size: 16pt; }
-  .body-base { font-size: 14pt; }
+  .body-base { font-size: 12pt; }
   .body-sm   { font-size: 12pt; }
 }
 
