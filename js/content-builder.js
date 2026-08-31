@@ -2696,12 +2696,32 @@ const ContentBuilder = (() => {
         if (target) {
           const top = target.getBoundingClientRect().top + window.scrollY - 32;
           window.scrollTo({ top, behavior: 'smooth' });
+          history.replaceState(null, '', '#' + slugify(b.sectionTitle));
         }
       });
       inner.appendChild(btn);
     });
 
     sidebar.appendChild(inner);
+  }
+
+  function slugify(str) {
+    return (str || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+
+  function findSectionBySlug(slug) {
+    if (!slug) return null;
+    return loadBlocks().find(b => b.type === 'section' && b.sectionTitle && slugify(b.sectionTitle) === slug) || null;
+  }
+
+  function scrollToHash(behavior) {
+    const hash = decodeURIComponent((window.location.hash || '').replace(/^#/, ''));
+    const block = findSectionBySlug(hash);
+    if (!block) return;
+    const target = document.getElementById('cb-section-' + block.id);
+    if (!target) return;
+    const top = target.getBoundingClientRect().top + window.scrollY - 32;
+    window.scrollTo({ top, behavior: behavior || 'auto' });
   }
 
   let _scrollSpyCleanup = null;
@@ -2780,6 +2800,8 @@ const ContentBuilder = (() => {
     initHeaderTextColor();
     initFolderLabel();
     render();
+    window.addEventListener('load', () => scrollToHash('auto'));
+    window.addEventListener('hashchange', () => scrollToHash('smooth'));
   }
 
   return { init };
